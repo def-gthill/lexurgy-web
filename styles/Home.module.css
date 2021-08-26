@@ -68,9 +68,12 @@
   resize: none;
 }
 
+.arrowContainer {
+  display: flex;
+  align-items: center;
+}
+
 .arrow {
-  height: 30rem;
-  line-height: 30rem;
   font-size: 1.5rem;
   font-weight: bolder;
   text-align: center;
@@ -121,9 +124,11 @@
     height: 10rem;
   }
 
+  .arrowContainer {
+    flex-direction: column;
+  }
+
   .arrow {
-    height: 3rem;
     writing-mode: vertical-lr;
-    margin: 0 auto;
   }
 }
