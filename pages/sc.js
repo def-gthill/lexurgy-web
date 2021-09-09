@@ -1,6 +1,6 @@
 import React from "react";
 import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import styles from '../styles/SC.module.css'
 import Editor from "../components/editor"
 import Arrow from "../components/arrow"
 import kotlin from "kotlin";
@@ -9,7 +9,7 @@ import lexurgy from "../lib/lexurgy";
 const version = "0.15.1"
 const releaseUrl = "https://github.com/def-gthill/lexurgy/releases/tag/v" + version
 
-export default class Home extends React.Component {
+export default class SC extends React.Component {
   constructor(props) {
     super(props);
     this.state = {

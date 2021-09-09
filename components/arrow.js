@@ -1,5 +1,5 @@
 import React from "react";
-import styles from '../styles/Home.module.css'
+import styles from '../styles/SC.module.css'
 
 export default class Arrow extends React.Component {
   render() {
