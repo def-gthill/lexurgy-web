@@ -33,7 +33,7 @@ export default class Home extends React.Component {
 
         <main className={styles.main}>
           <h1 className={styles.title}>
-            Lexurgy Sound Changer
+            Lexurgy Sound&nbsp;Changer
           </h1>
 
           <div className={styles.grid}>

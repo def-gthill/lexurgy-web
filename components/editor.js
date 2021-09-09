@@ -16,6 +16,7 @@ export default class Editor extends React.Component {
           value={this.props.value}
           onChange={this.props.handleChange}
           readOnly={!this.props.editable}
+          cols={1}
         />
       </div>
     )
