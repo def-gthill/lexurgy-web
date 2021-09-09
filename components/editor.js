@@ -4,6 +4,7 @@ import styles from '../styles/Home.module.css'
 export default class Editor extends React.Component {
   static defaultProps = {
     editable: true,
+    wrap: false,
   };
 
   render() {
@@ -17,6 +18,7 @@ export default class Editor extends React.Component {
           onChange={this.props.handleChange}
           readOnly={!this.props.editable}
           cols={1}
+          style={this.props.wrap ? {whiteSpace: "normal"} : {}}
         />
       </div>
     )

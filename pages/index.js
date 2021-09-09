@@ -16,6 +16,7 @@ export default class Home extends React.Component {
       input: "",
       changes: "",
       output: "",
+      error: false,
     }
     this.updateInput = this.updateInput.bind(this)
     this.updateChanges = this.updateChanges.bind(this)
@@ -56,6 +57,7 @@ export default class Home extends React.Component {
               label="Output"
               value={this.state.output}
               editable={false}
+              wrap={this.state.error}
             />
           </div>
 
@@ -112,8 +114,12 @@ export default class Home extends React.Component {
   runLexurgy() {
     const sc = lexurgy.com.meamoria.lexurgy.sc
     const input = new kotlin.kotlin.collections.ArrayList(this.state.input.split("\n"))
-    const soundChanger = sc.SoundChanger.Companion.fromLsc_61zpoe$(this.state.changes)
-    const output = soundChanger.change_i6pp2q$(input).toArray()
-    this.setState({output: output.join("\n")})
+    try {
+      const soundChanger = sc.SoundChanger.Companion.fromLsc_61zpoe$(this.state.changes)
+      const output = soundChanger.change_i6pp2q$(input).toArray()
+      this.setState({output: output.join("\n"), error: false})
+    } catch (e) {
+      this.setState({output: e.message, error: true})
+    }
   }
 }

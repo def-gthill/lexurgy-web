@@ -67,6 +67,7 @@
 .editor textarea {
   height: 30rem;
   resize: none;
+  white-space: pre;
 }
 
 .arrowContainer {
