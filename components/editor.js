@@ -10,7 +10,7 @@ export default class Editor extends React.Component {
   render() {
     const containerStyle = styles[this.props.id + "Container"];
     return (
-      <div className={styles.editor + ' ' + containerStyle}>
+      <div className={`${styles.editor} ${containerStyle}`}>
         <label htmlFor={this.props.id}>{this.props.label}</label>
         <textarea
           id={this.props.id}

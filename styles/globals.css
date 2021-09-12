@@ -22,3 +22,57 @@ a {
 * {
   box-sizing: border-box;
 }
+
+main {
+  width: 90%;
+  margin: auto;
+  padding: 2rem 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+h1 {
+  margin: 0;
+  line-height: 1.15;
+  font-size: 3rem;
+  text-align: center;
+}
+
+.button {
+  padding: 10px;
+  background: #645E9D;
+  border: none;
+  font: inherit;
+  color: white;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.button:hover {
+  color: #E5E8B6;
+}
+
+.big-button {
+  font-size: 2em;
+}
+
+footer {
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+}
+
+footer a {
+  color: #645E9D;
+  font-weight: bold;
+
+}
+
+footer a:hover,
+footer a:focus,
+footer a:active {
+  text-decoration: underline;
+}
