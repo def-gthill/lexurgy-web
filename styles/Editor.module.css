@@ -1,0 +1,11 @@
+
+.editor {
+  display: flex;
+  flex-direction: column;
+}
+
+.editor textarea {
+  height: 30rem;
+  resize: none;
+  white-space: pre;
+}

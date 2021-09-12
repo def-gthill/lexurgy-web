@@ -1,5 +1,5 @@
 import React from "react";
-import styles from '../styles/SC.module.css'
+import styles from '../styles/Editor.module.css'
 
 export default class Editor extends React.Component {
   static defaultProps = {
@@ -8,9 +8,8 @@ export default class Editor extends React.Component {
   };
 
   render() {
-    const containerStyle = styles[this.props.id + "Container"];
     return (
-      <div className={`${styles.editor} ${containerStyle}`}>
+      <div className={`${styles.editor} ${this.props.styles}`}>
         <label htmlFor={this.props.id}>{this.props.label}</label>
         <textarea
           id={this.props.id}

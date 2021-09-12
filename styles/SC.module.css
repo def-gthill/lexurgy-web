@@ -19,17 +19,6 @@
   margin: 3rem 0;
 }
 
-.editor {
-  display: flex;
-  flex-direction: column;
-}
-
-.editor textarea {
-  height: 30rem;
-  resize: none;
-  white-space: pre;
-}
-
 .arrowContainer {
   display: flex;
   align-items: center;
@@ -78,7 +67,7 @@
     flex-basis: 0;
   }
 
-  .editor textarea {
+  .stackedEditor textarea {
     height: 10rem;
   }
 

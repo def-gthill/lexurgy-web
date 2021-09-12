@@ -43,6 +43,7 @@ export default class SC extends React.Component {
               label="Input Words"
               value={this.state.input}
               handleChange={this.updateInput}
+              styles={`${styles.stackedEditor} ${styles.inputContainer}`}
             />
             <Arrow/>
             <Editor
@@ -50,6 +51,7 @@ export default class SC extends React.Component {
               label="Sound Changes"
               value={this.state.changes}
               handleChange={this.updateChanges}
+              styles={`${styles.stackedEditor} ${styles.changesContainer}`}
             />
             <Arrow/>
             <Editor
@@ -58,6 +60,7 @@ export default class SC extends React.Component {
               value={this.state.output}
               editable={false}
               wrap={this.state.error}
+              styles={`${styles.stackedEditor} ${styles.outputContainer}`}
             />
           </div>
 
