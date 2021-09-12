@@ -67,7 +67,7 @@
     flex-basis: 0;
   }
 
-  .stackedEditor textarea {
+  div.stackedEditor textarea {
     height: 10rem;
   }
 
