@@ -9,3 +9,14 @@
   resize: none;
   white-space: pre;
 }
+
+.buttonContainer {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+}
+
+.buttonContainer > * {
+  margin: 2px 0;
+  flex-grow: 1;
+}
