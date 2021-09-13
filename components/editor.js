@@ -12,6 +12,7 @@ export default class Editor extends React.Component {
     this.handleChange = this.handleChange.bind(this)
     this.promptForFile = this.promptForFile.bind(this)
     this.loadRef = React.createRef();
+    this.save = this.save.bind(this)
   }
 
   render() {
@@ -39,7 +40,7 @@ export default class Editor extends React.Component {
             />
             <button className="button" onClick={this.promptForFile}>Load</button>
           </>}
-          <button className="button">Save</button>
+          <button className="button" onClick={this.save}>Save</button>
         </div>
       </div>
     )
@@ -58,5 +59,16 @@ export default class Editor extends React.Component {
     if (selectedFiles.length > 0) {
       this.props.updateValue(id, await event.target.files[0].text())
     }
+  }
+
+  save(event) {
+    const a = document.createElement('a')
+    const file = new Blob([event.target.value], {type: 'text/plain'})
+
+    a.href = URL.createObjectURL(file)
+    a.download = "lexurgy" + this.props.expectedFileType
+    a.click()
+
+    URL.revokeObjectURL(a.href)
   }
 }
