@@ -18,7 +18,6 @@ export default class SC extends React.Component {
       output: "",
       error: false,
     }
-    this.updateEditor = this.updateEditor.bind(this)
     this.updateEditorWith = this.updateEditorWith.bind(this)
     this.runLexurgy = this.runLexurgy.bind(this)
   }
@@ -42,8 +41,8 @@ export default class SC extends React.Component {
               id="input"
               label="Input Words"
               value={this.state.input}
-              handleChange={this.updateEditor}
               updateValue={this.updateEditorWith}
+              expectedFileType=".wli"
               styles={`${styles.stackedEditor} ${styles.inputContainer}`}
             />
             <Arrow/>
@@ -51,8 +50,8 @@ export default class SC extends React.Component {
               id="changes"
               label="Sound Changes"
               value={this.state.changes}
-              handleChange={this.updateEditor}
               updateValue={this.updateEditorWith}
+              expectedFileType=".lsc"
               styles={`${styles.stackedEditor} ${styles.changesContainer}`}
             />
             <Arrow/>
@@ -77,13 +76,8 @@ export default class SC extends React.Component {
     )
   }
 
-  updateEditor(event) {
-    this.updateEditorWith(event, event.target.value)
-  }
-
-  updateEditorWith(event, newValue) {
-    console.log(newValue)
-    this.setState({[event.target.id]: newValue})
+  updateEditorWith(id, newValue) {
+    this.setState({[id]: newValue})
   }
 
   runLexurgy() {

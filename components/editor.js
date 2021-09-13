@@ -9,8 +9,9 @@ export default class Editor extends React.Component {
 
   constructor(props) {
     super(props);
+    this.handleChange = this.handleChange.bind(this)
     this.promptForFile = this.promptForFile.bind(this)
-    this.load = this.load.bind(this)
+    this.loadRef = React.createRef();
   }
 
   render() {
@@ -20,26 +21,42 @@ export default class Editor extends React.Component {
         <textarea
           id={this.props.id}
           value={this.props.value}
-          onChange={this.props.handleChange}
+          onChange={this.handleChange}
           readOnly={!this.props.editable}
           cols={1}
+          spellCheck={false}
           style={this.props.wrap ? {whiteSpace: "normal"} : {}}
         />
         <div className={styles.buttonContainer}>
-          <input type="file" accept="text/*,.txt,.wli" onInput={this.load} style={{display: "none"}}/>
-          <button className="button" onClick={this.promptForFile}>Load</button>
+          {this.props.editable && <>
+            <input
+              className="button"
+              type="file"
+              accept={`text/*,.txt,${this.props.expectedFileType}`}
+              ref={this.loadRef}
+              style={{display: "none"}}
+              onInput={this.load.bind(this, this.props.id)}
+            />
+            <button className="button" onClick={this.promptForFile}>Load</button>
+          </>}
           <button className="button">Save</button>
         </div>
       </div>
     )
   }
 
-  promptForFile(event) {
-    // noinspection JSUnresolvedFunction
-    event.target.parentNode.firstChild.click()
+  handleChange(event) {
+    this.props.updateValue(event.target.id, event.target.value)
   }
 
-  async load(event) {
-    this.props.updateValue(event, await event.target.files[0].text())
+  promptForFile() {
+    this.loadRef.current.click()
+  }
+
+  async load(id, event) {
+    const selectedFiles = event.target.files
+    if (selectedFiles.length > 0) {
+      this.props.updateValue(id, await event.target.files[0].text())
+    }
   }
 }
