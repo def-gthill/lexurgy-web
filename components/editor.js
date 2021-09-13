@@ -7,6 +7,12 @@ export default class Editor extends React.Component {
     wrap: false,
   };
 
+  constructor(props) {
+    super(props);
+    this.promptForFile = this.promptForFile.bind(this)
+    this.load = this.load.bind(this)
+  }
+
   render() {
     return (
       <div className={`${styles.editor} ${this.props.styles}`}>
@@ -20,10 +26,20 @@ export default class Editor extends React.Component {
           style={this.props.wrap ? {whiteSpace: "normal"} : {}}
         />
         <div className={styles.buttonContainer}>
-          <button className="button">Load</button>
+          <input type="file" accept="text/*,.txt,.wli" onInput={this.load} style={{display: "none"}}/>
+          <button className="button" onClick={this.promptForFile}>Load</button>
           <button className="button">Save</button>
         </div>
       </div>
     )
+  }
+
+  promptForFile(event) {
+    // noinspection JSUnresolvedFunction
+    event.target.parentNode.firstChild.click()
+  }
+
+  async load(event) {
+    this.props.updateValue(event, await event.target.files[0].text())
   }
 }

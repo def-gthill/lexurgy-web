@@ -18,8 +18,8 @@ export default class SC extends React.Component {
       output: "",
       error: false,
     }
-    this.updateInput = this.updateInput.bind(this)
-    this.updateChanges = this.updateChanges.bind(this)
+    this.updateEditor = this.updateEditor.bind(this)
+    this.updateEditorWith = this.updateEditorWith.bind(this)
     this.runLexurgy = this.runLexurgy.bind(this)
   }
 
@@ -42,7 +42,8 @@ export default class SC extends React.Component {
               id="input"
               label="Input Words"
               value={this.state.input}
-              handleChange={this.updateInput}
+              handleChange={this.updateEditor}
+              updateValue={this.updateEditorWith}
               styles={`${styles.stackedEditor} ${styles.inputContainer}`}
             />
             <Arrow/>
@@ -50,7 +51,8 @@ export default class SC extends React.Component {
               id="changes"
               label="Sound Changes"
               value={this.state.changes}
-              handleChange={this.updateChanges}
+              handleChange={this.updateEditor}
+              updateValue={this.updateEditorWith}
               styles={`${styles.stackedEditor} ${styles.changesContainer}`}
             />
             <Arrow/>
@@ -58,6 +60,7 @@ export default class SC extends React.Component {
               id="output"
               label="Output"
               value={this.state.output}
+              updateValue={this.updateEditorWith}
               editable={false}
               wrap={this.state.error}
               styles={`${styles.stackedEditor} ${styles.outputContainer}`}
@@ -74,17 +77,17 @@ export default class SC extends React.Component {
     )
   }
 
-  updateInput(event) {
-    const newInput = event.target.value
-    this.setState({input: newInput})
+  updateEditor(event) {
+    this.updateEditorWith(event, event.target.value)
   }
 
-  updateChanges(event) {
-    const newChanges = event.target.value
-    this.setState({changes: newChanges})
+  updateEditorWith(event, newValue) {
+    console.log(newValue)
+    this.setState({[event.target.id]: newValue})
   }
 
   runLexurgy() {
+    // noinspection JSUnresolvedVariable
     const sc = lexurgy.com.meamoria.lexurgy.sc
     const input = new kotlin.kotlin.collections.ArrayList(this.state.input.split("\n"))
     try {
