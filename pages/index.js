@@ -15,9 +15,11 @@ export default function Home() {
           Lexurgy
         </h1>
 
-        <p>This site is under construction. Visit the old app below:</p>
-
-        <a className="button big-button" href="https://www.meamoria.com/lexurgy/app/sc">Sound Changer</a>
+        <div className={styles.grid}>
+          <Link href="/sc">
+            <a className="button big-button">Sound Changer</a>
+          </Link>
+        </div>
       </main>
     </div>
   )
