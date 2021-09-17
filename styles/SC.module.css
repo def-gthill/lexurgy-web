@@ -6,6 +6,10 @@
   align-items: center;
 }
 
+.header {
+  display: flex;
+}
+
 .main {
   justify-content: center;
 }

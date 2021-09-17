@@ -1,6 +1,7 @@
 import React from "react";
-import Head from 'next/head'
-import styles from '../styles/SC.module.css'
+import Head from "next/head"
+import Image from "next/image"
+import styles from "../styles/SC.module.css"
 import Editor from "../components/editor"
 import Arrow from "../components/arrow"
 import kotlin from "kotlin";
@@ -28,14 +29,17 @@ export default class SC extends React.Component {
         <Head>
           <title>Lexurgy SC</title>
           <meta name="description" content="A high-powered sound change applier"/>
-          <link rel="icon" href="/favicon.ico"/>
+          <link rel="icon" href="/favicon.png"/>
         </Head>
 
-        <main className={styles.main}>
+        <header className={styles.header}>
+          <Image src="/logo.png" alt="" width={96} height={96}/>
           <h1 className={styles.title}>
             Lexurgy Sound&nbsp;Changer
           </h1>
+        </header>
 
+        <main className={styles.main}>
           <div className={styles.grid}>
             <Editor
               id="input"

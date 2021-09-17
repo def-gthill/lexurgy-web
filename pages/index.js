@@ -7,7 +7,7 @@ export default function Home() {
     <div className={styles.container}>
       <Head>
         <title>Lexurgy</title>
-        <link rel="icon" href="/favicon.ico"/>
+        <link rel="icon" href="/favicon.png"/>
       </Head>
 
       <main className="main">
