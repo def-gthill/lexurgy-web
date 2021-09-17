@@ -52,7 +52,7 @@ h1 {
 }
 
 .button:hover {
-  color: #E5E8B6;
+  opacity: 0.9;
 }
 
 .big-button {
