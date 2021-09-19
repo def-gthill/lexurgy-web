@@ -1,5 +1,6 @@
 import React from "react";
 import Head from "next/head"
+import Link from "next/link"
 import Image from "next/image"
 import styles from "../styles/SC.module.css"
 import Editor from "../components/editor"
@@ -33,10 +34,38 @@ export default class SC extends React.Component {
         </Head>
 
         <header className={styles.header}>
-          <Image src="/logo.png" alt="" width={96} height={96}/>
+          <Link href="/">
+            <a>
+              <Image src="/logo.png" alt="Home" width={96} height={96} layout="fixed"/>
+            </a>
+          </Link>
           <h1 className={styles.title}>
             Lexurgy Sound&nbsp;Changer
           </h1>
+          <div className={styles.spacer}/>
+          <div className={styles.menu}>
+            <div className={styles.menuButton}>Help</div>
+            <ul className={styles.menuList}>
+              <li>
+                <a
+                  href="https://www.meamoria.com/lexurgy/html/sc-tutorial.html"
+                  target="_blank" rel="noreferrer"
+                >Docs</a>
+              </li>
+              <li>
+                <a
+                  href="https://github.com/def-gthill/lexurgy"
+                  target="_blank" rel="noreferrer"
+                >GitHub</a>
+              </li>
+              <li>
+                <a
+                  href="https://www.meamoria.com/contact-me/"
+                  target="_blank" rel="noreferrer"
+                >Contact</a>
+              </li>
+            </ul>
+          </div>
         </header>
 
         <main className={styles.main}>
