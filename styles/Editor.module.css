@@ -1,3 +1,8 @@
+@font-face {
+  font-family: "FreeMono";
+  /*noinspection CssUnknownTarget*/
+  src: url("/FreeMono.woff");
+}
 
 .editor {
   display: flex;
@@ -8,6 +13,8 @@
   height: 30rem;
   resize: none;
   white-space: pre;
+  font-family: "SFMono-Regular", "Consolas", "Menlo", "Liberation Mono", "Ubuntu Mono", "FreeMono", monospace;
+  text-rendering: optimizeLegibility !important;
 }
 
 .buttonContainer {
