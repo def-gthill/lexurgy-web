@@ -139,6 +139,7 @@
 
   div.stackedEditor textarea {
     height: 10rem;
+    font-size: 16px;
   }
 
   .arrowContainer {
