@@ -44,7 +44,7 @@ export default class SC extends React.Component {
           </h1>
           <div className={styles.spacer}/>
           <div className={styles.menu}>
-            <div className={styles.menuButton}>Help</div>
+            <div className={styles.menuButton}>Links</div>
             <ul className={styles.menuList}>
               <li>
                 <a
