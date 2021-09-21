@@ -1,0 +1,21 @@
+# This isn't what Lexurgy is designed for at all.
+# But it's possible!
+
+Class digit {\0, \1, \2, \3, \4, \5, \6, \7, \8, \9}
+Class inc {\1, \2, \3, \4, \5, \6, \7, \8, \9, '\0}
+
+line-up-digits propagate:
+ | @digit$1 \+ @digit$2 => $2 | $1 \+ / _ @digit
+ Then:
+ @digit$1 \+ @digit$2 * * => \+ $2 | $1 \+ / _ @digit // | _
+
+add-one-digit propagate:
+ @digit \+ @inc => @inc \+ @digit
+ \+0 => *
+
+remove-signs:
+ {|, \+} => *
+
+carry propagate:
+ @digit ' => @inc *
+ ' => \1 / $ _

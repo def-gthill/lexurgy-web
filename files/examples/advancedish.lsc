@@ -1,0 +1,56 @@
+
+Feature type(*cons, vowel)
+
+Feature place(bilabial, alveolar, velar, glottal)
+Feature manner(stop, fricative, nasal, lateral)
+
+Feature height(low, mid, high)
+Feature frontness(front, central, back)
+
+Feature stress(*unstressed, secondary, primary)
+
+Diacritic ˈ [primary]
+Diacritic ˌ [secondary]
+
+Symbol a [low central vowel]
+Symbol e [mid front vowel]
+Symbol i [high front vowel]
+Symbol o [mid back vowel]
+Symbol u [high back vowel]
+
+Class stop {p, t, k}
+Class sonorant {m, n, l}
+
+Deromanizer:
+ ' => ʔ
+
+primary-stress-second-last-syllable [vowel]:
+ [] => [primary] / _ [] $
+
+add-secondary-stress [vowel] propagate:
+ # Applies secondary stress to alternating vowels before the main stress
+ [unstressed] => [secondary] / _ [] {[primary], [secondary]}
+
+Romanizer-before-syncope:
+ unchanged
+
+syncope:
+ [unstressed vowel] => * // _ $
+ Then:
+ # Secondary stress has served its purpose
+ [secondary] => [unstressed]
+
+glottal-loss:
+ ʔ => * / {[cons] _, _ [cons]}
+
+stop-stop-clusters:
+ @stop => * / $ _ @stop
+ @stop => $1 / _ @stop$1
+
+obey-sonority:
+ @sonorant$1 @stop$2 => $2 $1 / $ _
+
+Romanizer:
+ # Get rid of the stress marks, since stress is still predictable
+ [primary] => [unstressed]
+

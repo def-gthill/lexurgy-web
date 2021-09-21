@@ -12,11 +12,16 @@ const version = "0.15.1"
 const releaseUrl = "https://github.com/def-gthill/lexurgy/releases/tag/v" + version
 
 export default class SC extends React.Component {
+  static defaultProps = {
+    input: "",
+    changes: "",
+  }
+
   constructor(props) {
     super(props);
     this.state = {
-      input: "",
-      changes: "",
+      input: props.input,
+      changes: props.changes,
       output: "",
       error: false,
     }
