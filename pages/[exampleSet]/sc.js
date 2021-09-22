@@ -8,6 +8,7 @@ export default function ExampleSC(props) {
 }
 
 export async function getServerSideProps(context) {
+  // noinspection JSUnresolvedVariable
   const exampleSet = context.params.exampleSet
   const exampleDirectory = path.join(
     process.cwd(),
@@ -49,6 +50,7 @@ async function getFiles(exampleDirectory, changesId, inputId) {
   )
   const exampleJson = JSON.parse(exampleContents)
   const changes = exampleJson.changes.find((x) => x.id === changesId)
+  // noinspection JSUnresolvedVariable
   const input = exampleJson.wordlists.find((x) => x.id === inputId)
   return {
     changes: changes.file,
