@@ -1,51 +1,3 @@
-.container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.header {
-  background-color: #645E9D;
-  width: 100%;
-  display: flex;
-  align-items: center;
-}
-
-.title {
-  color: white;
-  padding: 5px;
-  text-align: left;
-}
-
-.spacer {
-  flex-basis: 30px;
-  flex-shrink: 0;
-  flex-grow: 1;
-}
-
-.menuButton {
-  display: none;
-}
-
-.menuList {
-  list-style-type: none;
-  padding-inline-start: 0;
-  margin: 0;
-  display: flex;
-}
-
-.menuList a {
-  display: inline-block;
-}
-
-.menuButton, .menuList a {
-  font-size: 1.5rem;
-  color: white;
-  background-color: #645E9D;
-  padding: 10px;
-}
-
 .main {
   justify-content: center;
 }
@@ -82,45 +34,7 @@
   flex: 1 0 200px;
 }
 
-.footer {
-
-}
-
-@media (max-width: 875px) {
-  .title {
-    font-size: 2rem;
-  }
-}
-
 @media (max-width: 700px) {
-  .menuButton {
-    display: revert;
-    cursor: pointer;
-    position: relative;
-    text-align: right;
-  }
-
-  .menuList {
-    display: none;
-    position: absolute;
-    right: 0;
-    z-index: 1;
-  }
-
-  .menu:hover .menuList {
-    display: block;
-  }
-
-  .menuList a {
-    display: block;
-    width: 100%;
-    text-align: right;
-  }
-
-  .menuList a:hover {
-    background-color: #65AFFF;
-  }
-
   .grid {
     flex-direction: column;
   }
@@ -148,28 +62,5 @@
 
   .arrow {
     writing-mode: vertical-lr;
-  }
-}
-
-@media (max-width: 450px) {
-  .header {
-    flex-wrap: wrap;
-  }
-
-  .spacer {
-    display: none;
-  }
-
-  .menuButton {
-    text-align: left;
-  }
-
-  .menuList {
-    left: 0;
-    right: revert;
-  }
-
-  .menuList a {
-    text-align: left;
   }
 }

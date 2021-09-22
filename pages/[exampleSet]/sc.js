@@ -1,10 +1,15 @@
 import path from "path";
 import { promises as fs } from "fs";
 import React from "react";
-import SC from "../sc.js";
+import SC from "../../components/sc";
+import Frame from "../../components/frame"
 
 export default function ExampleSC(props) {
-  return <SC input={props.input} changes={props.changes}/>
+  return (
+    <Frame>
+      <SC input={props.input} changes={props.changes}/>
+    </Frame>
+  )
 }
 
 export async function getServerSideProps(context) {
