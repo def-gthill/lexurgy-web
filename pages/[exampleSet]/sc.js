@@ -15,6 +15,11 @@ export async function getServerSideProps(context) {
     "files",
     exampleSet,
   )
+
+  if (!context.query.changes && !context.query.input) {
+    return { props: {} }
+  }
+
   const files = await getFiles(
     exampleDirectory,
     parseInt(context.query.changes),
