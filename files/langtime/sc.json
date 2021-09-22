@@ -1,0 +1,39 @@
+{
+  "changes": [
+    {
+      "id": 1,
+      "name": "Engala (Rabbits)",
+      "file": "engala.lsc",
+      "inputs": [1]
+    },
+    {
+      "id": 2,
+      "name": "Tpaalha (Opossums)",
+      "file": "tpaalha.lsc",
+      "inputs": [2]
+    },
+    {
+      "id": 3,
+      "name": "Mice",
+      "file": "mouse.lsc",
+      "inputs": [3]
+    }
+  ],
+  "wordlists": [
+    {
+      "id": 1,
+      "name": "Proto-Engala",
+      "file": "engala.wli"
+    },
+    {
+      "id": 2,
+      "name": "Proto-Tpaalha",
+      "file": "tpaalha.wli"
+    },
+    {
+      "id": 3,
+      "name": "Proto-Mouse",
+      "file": "mouse.wli"
+    }
+  ]
+}

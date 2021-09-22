@@ -1,0 +1,120 @@
+Feature Stress(*unstressed, stressed)
+Feature Length(*short, long)
+Diacritic ː [long]
+Diacritic ˈ (floating) [stressed]
+Symbol ᵐb, ⁿd, ᵑɡ, ⁿz
+
+Class vowel {a, i, u, ə, e, o, æ}
+Class consonant {p, t, k, f, s, z, ʃ, ʒ, x, h, l, m, n, ŋ, ᵐb, ⁿd, ᵑɡ, ⁿz, b, d, ɡ}
+Class nasal {m, n, ŋ}
+Class prenasalized {ᵐb, ⁿd, ᵑɡ, ⁿz}
+Class high {i, u}
+Class glide {j, w}
+Class vocalic {@vowel, @glide}
+
+Deromanizer:
+ ǝˈ => əˈ
+ ǝ => ə
+ g => ɡ
+
+copy-vowel-insertion:
+ * => $1 / {@vowel$1 @vowel, @vowel$1} @consonant+ _ $ // {n, s} _ $
+
+stress-first-syllable @vowel:
+ [unstressed] => [stressed] / $ _
+
+vowel-epenthesis:
+ * => a / $ _ @prenasalized aˈ
+ * => e / $ _ @prenasalized eˈ
+ * => i / $ _ @prenasalized iˈ
+ * => u / $ _ @prenasalized uˈ
+ * => ə / $ _ @prenasalized əˈ
+
+nasal-assimilation:
+ @nasal => n / _ {t, s, z, l, n, ⁿd, ⁿz, d}
+ @nasal => m / _ {p, ᵐb, b, m, f}
+ @nasal => ŋ / _ {k, ᵑɡ, ɡ, x}
+
+voicing-assimilation:
+ s => z / _ {@prenasalized, z}
+
+spirant-lenition:
+ s => h / _ {p, t, k, f, s, x}
+
+obstruent-assimilation:
+ h => $1 / _ @consonant$1
+
+prenasalized-simplification:
+ {ᵐb, ⁿd, ᵑɡ, ⁿz} => {mb, nd, ŋɡ, nz}
+
+hiatus-resolution:
+ {əu, əi, əa, aə} => {o, e, əː, aː}
+ Then:
+ {iˈ, uˈ} @vowel => {i, u} [stressed]
+ Then:
+ @high => @glide / _ @vowel
+ Then:
+ @high => @glide / @vowel _
+
+nasal-raising:
+ {a, ə, e, o} => {ə, ɨ, i, u} / _ @nasal {@consonant, $}
+
+central-vowel-annihilation:
+ {aˈ, əˈ, ɨˈ} => {æˈ, eˈ, iˈ}
+
+progressive-assimilation:
+ {ə!, ɨ!} => {e, i} / {i, e, æ, j} @consonant+ _
+ {ə!, ɨ!} => {o, u} / {u, o, w} @consonant+ _
+
+post-nasal-lenition:
+ {b, d, ɡ} => * / @nasal _
+ {p, t, k, f, x} => {b, d, ɡ, h, h} / @nasal _
+ * => d / @nasal _ l
+ * => t / n _ s
+ n => d / _ z
+
+frequickative-lenition:
+ {f, x} => {v, ɣ} / @vocalic _ @vocalic
+
+voiceless-stop-lenition:
+ {p, t, k} => {b, d, ɡ} / @vocalic _ @vocalic
+
+velarization:
+ {t, d, n} => {k, ɡ, ŋ} / _ w
+
+palatalization:
+ {t, d, n, s, z, l, x, ɣ, h, ŋ} j => {tʃ, dʒ, ɲ, ʃ, ʒ, ʎ, ʃ, ʒ, ʃ, ɲ} *
+
+degemination:
+ @consonant$1 => * / _ $1
+
+central-vowel-annihilation-part-two:
+ {ə, ɨ} => {e, i}
+
+palatal-assimilation:
+ z => ʒ / _ dʒ
+
+affricate-simplification:
+ {dz, dʒ} => {z, ʒ} / {z, ʒ} _
+
+Romanizer-phonetic literal:
+ * => ^ / {$, @vowel} _ {@consonant, @glide}* [stressed]
+ Then:
+ [stressed] => [unstressed]
+ Then:
+ ^ => ˈ
+
+Romanizer:
+ [stressed] => [unstressed] / $ {@consonant, @glide}* _
+ Then:
+ [long]$1 * => $1 $1
+ Then:
+ [long] => [short]
+ Then:
+ æ => a
+ ɡ => g
+ {tʃ, ʃ, dʒ, ʒʒ, ʒ, ɣ, x} => {ch, sh, j, zzh, zh, gh, kh}
+ {j, w} => {i, u} / @vowel _
+ j => y
+ Then:
+ {aˈ, eˈ, iˈ, oˈ, uˈ} => {á, é, í, ó, ú}
