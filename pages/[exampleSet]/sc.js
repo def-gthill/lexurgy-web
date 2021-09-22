@@ -18,7 +18,12 @@ export async function getServerSideProps(context) {
     exampleDirectory,
     parseInt(context.query.changes),
     parseInt(context.query.input),
-  )
+  ).catch(() => {})
+  if (!files) {
+    return {
+      notFound: true
+    }
+  }
 
   const changes = await fs.readFile(
     path.join(exampleDirectory, files.changes),
