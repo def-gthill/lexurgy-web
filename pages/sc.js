@@ -121,7 +121,7 @@ export default class SC extends React.Component {
   runLexurgy() {
     // noinspection JSUnresolvedVariable
     const sc = lexurgy.com.meamoria.lexurgy.sc
-    const input = new kotlin.kotlin.collections.ArrayList(this.state.input.split("\n"))
+    const input = new kotlin.kotlin.collections.ArrayList(this.state.input.split(/\r?\n/))
     try {
       const soundChanger = sc.SoundChanger.Companion.fromLsc_61zpoe$(this.state.changes)
       const output = soundChanger.change_i6pp2q$(input).toArray()
