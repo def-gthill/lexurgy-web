@@ -63,8 +63,15 @@ export async function getServerSideProps(context) {
     return notFound
   }
 
+  const examples = exampleJsonToExamples(exampleJson)
+
   if (!context.query.changes && !context.query.input) {
-    return { props: {} }
+    return {
+      props: {
+        exampleSet: exampleSet,
+        examples: examples,
+      }
+    }
   }
 
   const files = await getFiles(
@@ -82,7 +89,7 @@ export async function getServerSideProps(context) {
   return {
     props: {
       exampleSet: exampleSet,
-      examples: exampleJsonToExamples(exampleJson),
+      examples: examples,
       changesId: context.query.changes,
       changes: changes,
       inputId: context.query.input,
