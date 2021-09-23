@@ -1,6 +1,5 @@
 module.exports = {
   reactStrictMode: true,
-  serverRuntimeConfig: {
-    projectRoot: __dirname
-  }
+  target: "serverless",
+  experimental: { nftTracing: true },
 }

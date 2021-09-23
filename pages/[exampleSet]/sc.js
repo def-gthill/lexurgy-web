@@ -2,7 +2,6 @@ import path from "path";
 import { promises as fs } from "fs";
 import React from "react";
 import Link from "next/link";
-import getConfig from "next/config";
 import SC from "../../components/sc";
 import Frame from "../../components/frame"
 
@@ -100,13 +99,7 @@ export async function getServerSideProps(context) {
 }
 
 function getExampleDirectory(exampleSet) {
-  const exampleDirectory = path.join(
-    process.cwd(),
-    "files",
-    exampleSet,
-  )
-  console.log(exampleDirectory)
-  return exampleDirectory
+  return path.resolve(`./public/files/${exampleSet}`)
 }
 
 async function readExampleJson(exampleDirectory) {
