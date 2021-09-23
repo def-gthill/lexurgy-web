@@ -100,11 +100,13 @@ export async function getServerSideProps(context) {
 }
 
 function getExampleDirectory(exampleSet) {
-  return path.join(
-    getConfig().serverRuntimeConfig.projectRoot,
+  const exampleDirectory = path.join(
+    process.cwd(),
     "files",
     exampleSet,
   )
+  console.log(exampleDirectory)
+  return exampleDirectory
 }
 
 async function readExampleJson(exampleDirectory) {
