@@ -2,6 +2,7 @@ import path from "path";
 import { promises as fs } from "fs";
 import React from "react";
 import Link from "next/link";
+import getConfig from "next/config";
 import SC from "../../components/sc";
 import Frame from "../../components/frame"
 
@@ -100,7 +101,7 @@ export async function getServerSideProps(context) {
 
 function getExampleDirectory(exampleSet) {
   return path.join(
-    process.cwd(),
+    getConfig().serverRuntimeConfig.projectRoot,
     "files",
     exampleSet,
   )
