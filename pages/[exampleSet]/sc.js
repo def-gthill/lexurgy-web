@@ -101,7 +101,7 @@ export async function getServerSideProps(context) {
 
 function getExampleDirectory(exampleSet) {
   return path.join(
-    process.cwd(),
+    getConfig().serverRuntimeConfig.projectRoot,
     "files",
     exampleSet,
   )
