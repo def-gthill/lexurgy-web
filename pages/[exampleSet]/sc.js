@@ -1,15 +1,74 @@
 import path from "path";
 import { promises as fs } from "fs";
 import React from "react";
+import Link from "next/link";
 import SC from "../../components/sc";
 import Frame from "../../components/frame"
 
-export default function ExampleSC(props) {
-  return (
-    <Frame>
-      <SC input={props.input} changes={props.changes}/>
-    </Frame>
-  )
+export default class ExampleSC extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedChanges: 0,
+    }
+    this.handleExampleSelect = this.handleExampleSelect.bind(this)
+  }
+
+  render() {
+    const examples = [
+      {
+        name: "Basican",
+        changesId: 1,
+        inputId: 1,
+      },
+      {
+        name: "Intermediatese",
+        changesId: 2,
+        inputId: 1,
+      },
+      {
+        name: "Advancedish",
+        changesId: 3,
+        inputId: 1,
+      },
+      {
+        name: "Syllabian",
+        changesId: 4,
+        inputId: 2,
+      },
+      {
+        name: "Adding Machine",
+        changesId: 5,
+        inputId: 3,
+      },
+    ]
+    const options = examples.map((option, index) => (
+      <option
+        key={index}
+        value={index}
+        selected={index === this.state.selectedChanges}
+      >{option.name}</option>
+    ))
+    const selectedChangesId = examples[this.state.selectedChanges].changesId
+    const selectedInputId = examples[this.state.selectedChanges].inputId
+    return (
+      <Frame>
+        <label htmlFor="lscs">Sound Changes</label>
+        <select id="lscs" size={3} onChange={this.handleExampleSelect}>
+          {options}
+        </select>
+        <Link href={`/examples/sc?changes=${selectedChangesId}&input=${selectedInputId}`}>
+          <a className="button">Open</a>
+        </Link>
+        <SC input={this.props.input} changes={this.props.changes}/>
+      </Frame>
+    )
+  }
+
+  handleExampleSelect(event) {
+    this.setState({selectedChanges: event.target.value})
+  }
 }
 
 export async function getServerSideProps(context) {
