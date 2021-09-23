@@ -1,5 +1,5 @@
 import path from "path";
-import { promises as fs } from "fs";
+// import { promises as fs } from "fs";
 import React from "react";
 import Link from "next/link";
 import SC from "../../components/sc";
