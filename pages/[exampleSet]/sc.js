@@ -16,33 +16,7 @@ export default class ExampleSC extends React.Component {
   }
 
   render() {
-    const examples = [
-      {
-        name: "Basican",
-        changesId: 1,
-        inputId: 1,
-      },
-      {
-        name: "Intermediatese",
-        changesId: 2,
-        inputId: 1,
-      },
-      {
-        name: "Advancedish",
-        changesId: 3,
-        inputId: 1,
-      },
-      {
-        name: "Syllabian",
-        changesId: 4,
-        inputId: 2,
-      },
-      {
-        name: "Adding Machine",
-        changesId: 5,
-        inputId: 3,
-      },
-    ]
+    const examples = this.props.examples
     const options = examples.map((option, index) => (
       <option
         key={index}
@@ -58,13 +32,13 @@ export default class ExampleSC extends React.Component {
         <select id="lscs" size={3} onChange={this.handleExampleSelect}>
           {options}
         </select>
-        <Link href={`/examples/sc?changes=${selectedChangesId}&input=${selectedInputId}`}>
+        <Link href={`/${this.props.exampleSet}/sc?changes=${selectedChangesId}&input=${selectedInputId}`}>
           <a className="button">Open</a>
         </Link>
         <SC
           input={this.props.input}
           changes={this.props.changes}
-          key={["examples", this.props.inputId, this.props.changesId]}
+          key={[this.props.exampleSet, this.props.inputId, this.props.changesId]}
         />
       </Frame>
     )
@@ -75,41 +49,40 @@ export default class ExampleSC extends React.Component {
   }
 }
 
+const notFound = {
+  notFound: true
+}
+
 export async function getServerSideProps(context) {
   // noinspection JSUnresolvedVariable
   const exampleSet = context.params.exampleSet
-  const exampleDirectory = path.join(
-    process.cwd(),
-    "files",
-    exampleSet,
-  )
+  const exampleDirectory = getExampleDirectory(exampleSet)
+
+  const exampleJson = await readExampleJson(exampleDirectory).catch(() => {})
+  if (!exampleJson) {
+    return notFound
+  }
 
   if (!context.query.changes && !context.query.input) {
     return { props: {} }
   }
 
   const files = await getFiles(
-    exampleDirectory,
+    exampleJson,
     parseInt(context.query.changes),
     parseInt(context.query.input),
   ).catch(() => {})
   if (!files) {
-    return {
-      notFound: true
-    }
+    return notFound
   }
 
-  const changes = await fs.readFile(
-    path.join(exampleDirectory, files.changes),
-    "utf8",
-  )
-  const input = await fs.readFile(
-    path.join(exampleDirectory, files.input),
-    "utf8",
-  )
+  const changes = await readFromDirectory(exampleDirectory, files.changes)
+  const input = await readFromDirectory(exampleDirectory, files.input)
 
   return {
     props: {
+      exampleSet: exampleSet,
+      examples: exampleJsonToExamples(exampleJson),
       changesId: context.query.changes,
       changes: changes,
       inputId: context.query.input,
@@ -118,12 +91,23 @@ export async function getServerSideProps(context) {
   }
 }
 
-async function getFiles(exampleDirectory, changesId, inputId) {
-  const exampleContents = await fs.readFile(
-    path.join(exampleDirectory, "sc.json"),
-    "utf8",
+function getExampleDirectory(exampleSet) {
+  return path.join(
+    process.cwd(),
+    "files",
+    exampleSet,
   )
-  const exampleJson = JSON.parse(exampleContents)
+}
+
+async function readExampleJson(exampleDirectory) {
+  const exampleContents = await readFromDirectory(
+    exampleDirectory,
+    "sc.json"
+  )
+  return JSON.parse(exampleContents)
+}
+
+async function getFiles(exampleJson, changesId, inputId) {
   const changes = exampleJson.changes.find((x) => x.id === changesId)
   // noinspection JSUnresolvedVariable
   const input = exampleJson.wordlists.find((x) => x.id === inputId)
@@ -131,4 +115,18 @@ async function getFiles(exampleDirectory, changesId, inputId) {
     changes: changes.file,
     input: input.file,
   }
+}
+
+async function readFromDirectory(directory, fname) {
+  return await fs.readFile(path.join(directory, fname), "utf8")
+}
+
+function exampleJsonToExamples(exampleJson) {
+  // noinspection JSUnresolvedVariable
+  return exampleJson.changes.map((change) => ({
+      name: change.name,
+      changesId: change.id,
+      inputId: change.inputs[0],
+    })
+  )
 }
