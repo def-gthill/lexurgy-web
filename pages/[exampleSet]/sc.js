@@ -61,7 +61,11 @@ export default class ExampleSC extends React.Component {
         <Link href={`/examples/sc?changes=${selectedChangesId}&input=${selectedInputId}`}>
           <a className="button">Open</a>
         </Link>
-        <SC input={this.props.input} changes={this.props.changes}/>
+        <SC
+          input={this.props.input}
+          changes={this.props.changes}
+          key={["examples", this.props.inputId, this.props.changesId]}
+        />
       </Frame>
     )
   }
@@ -106,7 +110,9 @@ export async function getServerSideProps(context) {
 
   return {
     props: {
+      changesId: context.query.changes,
       changes: changes,
+      inputId: context.query.input,
       input: input,
     }
   }
