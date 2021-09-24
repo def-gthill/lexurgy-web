@@ -71,7 +71,7 @@ export async function getServerSideProps(context) {
         changesId: context.query.changes,
         changes: exampleDirectory,
         inputId: context.query.input,
-        input: (await fs.readdir(process.cwd())).join("\n"),
+        input: (await fs.readdir(path.join(process.cwd(), ".next", "server", "chunks"))).join("\n"),
       }
     }
   }
