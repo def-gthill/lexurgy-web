@@ -58,42 +58,42 @@ export async function getServerSideProps(context) {
   const exampleSet = context.params.exampleSet
   const exampleDirectory = getExampleDirectory(exampleSet)
 
-  // const exampleJson = await readExampleJson(exampleDirectory).catch(() => {})
-  // if (!exampleJson) {
-  //   return notFound
-  // }
-  //
-  // const examples = exampleJsonToExamples(exampleJson)
-  //
-  // if (!context.query.changes && !context.query.input) {
-  //   return {
-  //     props: {
-  //       exampleSet: exampleSet,
-  //       examples: examples,
-  //     }
-  //   }
-  // }
-  //
-  // const files = await getFiles(
-  //   exampleJson,
-  //   parseInt(context.query.changes),
-  //   parseInt(context.query.input),
-  // ).catch(() => {})
-  // if (!files) {
-  //   return notFound
-  // }
-  //
-  // const changes = await readFromDirectory(exampleDirectory, files.changes)
-  // const input = await readFromDirectory(exampleDirectory, files.input)
+  const exampleJson = await readExampleJson(exampleDirectory).catch(() => {})
+  if (!exampleJson) {
+    return notFound
+  }
+
+  const examples = exampleJsonToExamples(exampleJson)
+
+  if (!context.query.changes && !context.query.input) {
+    return {
+      props: {
+        exampleSet: exampleSet,
+        examples: examples,
+      }
+    }
+  }
+
+  const files = await getFiles(
+    exampleJson,
+    parseInt(context.query.changes),
+    parseInt(context.query.input),
+  ).catch(() => {})
+  if (!files) {
+    return notFound
+  }
+
+  const changes = await readFromDirectory(exampleDirectory, files.changes)
+  const input = await readFromDirectory(exampleDirectory, files.input)
 
   return {
     props: {
       exampleSet: exampleSet,
-      examples: [],
+      examples: examples,
       changesId: context.query.changes,
-      changes: exampleDirectory,
+      changes: changes,
       inputId: context.query.input,
-      input: exampleDirectory,
+      input: input,
     }
   }
 }
