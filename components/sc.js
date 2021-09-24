@@ -18,8 +18,11 @@ export default class SC extends React.Component {
       changes: props.changes,
       output: "",
       error: false,
+      outputArrows: true,
     }
     this.updateEditorWith = this.updateEditorWith.bind(this)
+    this.output = this.output.bind(this)
+    this.setOutputArrows = this.setOutputArrows.bind(this)
     this.runLexurgy = this.runLexurgy.bind(this)
   }
 
@@ -48,12 +51,20 @@ export default class SC extends React.Component {
           <Editor
             id="output"
             label="Output"
-            value={this.state.output}
+            value={this.output()}
             updateValue={this.updateEditorWith}
             editable={false}
             wrap={this.state.error}
             styles={`${styles.stackedEditor} ${styles.outputContainer}`}
-          />
+          >
+            <input
+              id="showInput"
+              type="checkbox"
+              checked={this.state.outputArrows}
+              onChange={this.setOutputArrows}
+            />
+            <label htmlFor="showInput">Show Input Words</label>
+          </Editor>
         </div>
 
         <button className="button big-button" onClick={this.runLexurgy}>Apply</button>
@@ -63,6 +74,18 @@ export default class SC extends React.Component {
 
   updateEditorWith(id, newValue) {
     this.setState({[id]: newValue})
+  }
+
+  output() {
+    if (this.state.error || this.state.outputArrows) {
+      return this.state.output
+    } else {
+      return "foobar"
+    }
+  }
+
+  setOutputArrows(event) {
+    this.setState({outputArrows: event.target.checked})
   }
 
   runLexurgy() {

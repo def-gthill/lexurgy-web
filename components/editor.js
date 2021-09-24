@@ -29,6 +29,7 @@ export default class Editor extends React.Component {
           style={this.props.wrap ? {whiteSpace: "normal"} : {}}
         />
         <div className={styles.buttonContainer}>
+          {this.props.children}
           {this.props.editable && <>
             <input
               className="button"
