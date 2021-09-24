@@ -112,7 +112,11 @@ export async function getServerSideProps(context) {
 }
 
 function getExampleDirectory(exampleSet) {
-  return path.resolve(`./public/files/${exampleSet}`)
+  let basePath = process.cwd()
+  if (process.env.NODE_ENV === "production") {
+    basePath = path.join(process.cwd(), ".next/server/chunks")
+  }
+  return path.join(basePath, "files", exampleSet)
 }
 
 async function readExampleJson(exampleDirectory) {
