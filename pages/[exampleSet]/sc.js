@@ -89,11 +89,7 @@ export async function getServerSideProps(context) {
   return {
     props: {
       exampleSet: exampleSet,
-      examples: [{
-        name: "Foo",
-        changesId: 1,
-        inputId: 1,
-      }],
+      examples: [],
       changesId: context.query.changes,
       changes: exampleDirectory,
       inputId: context.query.input,
