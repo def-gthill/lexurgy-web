@@ -16,14 +16,19 @@ export default function Frame(props) {
       </Head>
 
       <header className={styles.header}>
-        <Link href="/">
+        <Image src="/logo.png" alt="Home" width={96} height={96} layout="fixed"/>
+        {/*<Link href="/">*/}
+        {/*  <a>*/}
+        {/*    <Image src="/logo.png" alt="Home" width={96} height={96} layout="fixed"/>*/}
+        {/*  </a>*/}
+        {/*</Link>*/}
+        <Link href="/sc">
           <a>
-            <Image src="/logo.png" alt="Home" width={96} height={96} layout="fixed"/>
+            <h1 className={styles.title}>
+              Lexurgy Sound&nbsp;Changer
+            </h1>
           </a>
         </Link>
-        <h1 className={styles.title}>
-          Lexurgy Sound&nbsp;Changer
-        </h1>
         <div className={styles.spacer}/>
         <div className={styles.menu}>
           <div className={styles.menuButton}>Links</div>
@@ -33,6 +38,9 @@ export default function Frame(props) {
                 href="https://www.meamoria.com/lexurgy/html/sc-tutorial.html"
                 target="_blank" rel="noreferrer"
               >Docs</a>
+            </li>
+            <li>
+              <a href="/examples/sc" target="_blank">Examples</a>
             </li>
             <li>
               <a
