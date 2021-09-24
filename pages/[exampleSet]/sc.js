@@ -60,20 +60,7 @@ export async function getServerSideProps(context) {
 
   const exampleJson = await readExampleJson(exampleDirectory).catch(() => {})
   if (!exampleJson) {
-    return {
-      props: {
-        exampleSet: exampleSet,
-        examples: [{
-          name: "Foo",
-          changeId: 1,
-          inputId: 1,
-        }],
-        changesId: context.query.changes,
-        changes: exampleDirectory,
-        inputId: context.query.input,
-        input: process.cwd(),
-      }
-    }
+    return notFound
   }
 
   const examples = exampleJsonToExamples(exampleJson)
