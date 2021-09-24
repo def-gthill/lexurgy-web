@@ -2,8 +2,10 @@ import React from "react";
 import styles from "../styles/SC.module.css"
 import Editor from "../components/editor"
 import Arrow from "../components/arrow"
-import kotlin from "kotlin";
 import lexurgy from "../lib/lexurgy";
+
+// noinspection JSUnresolvedVariable
+const lex = lexurgy.com.meamoria.lexurgy
 
 export default class SC extends React.Component {
   static defaultProps = {
@@ -16,8 +18,8 @@ export default class SC extends React.Component {
     this.state = {
       input: props.input,
       changes: props.changes,
-      output: "",
-      error: false,
+      stages: null,
+      error: null,
       outputArrows: true,
     }
     this.updateEditorWith = this.updateEditorWith.bind(this)
@@ -58,12 +60,12 @@ export default class SC extends React.Component {
             styles={`${styles.stackedEditor} ${styles.outputContainer}`}
           >
             <input
-              id="showInput"
+              id="showStages"
               type="checkbox"
               checked={this.state.outputArrows}
               onChange={this.setOutputArrows}
             />
-            <label htmlFor="showInput">Show Input Words</label>
+            <label htmlFor="showStages">Show Stages</label>
           </Editor>
         </div>
 
@@ -77,10 +79,15 @@ export default class SC extends React.Component {
   }
 
   output() {
-    if (this.state.error || this.state.outputArrows) {
-      return this.state.output
+    if (this.state.error) {
+      return this.state.error
+    } else if (!this.state.stages) {
+      return ""
+    } else if (this.state.outputArrows) {
+      const stages = [this.splitInput()].concat(this.state.stages)
+      return lex.scMakeStageComparisons(stages).join("\n")
     } else {
-      return "foobar"
+      return this.state.stages.at(-1).join("\n")
     }
   }
 
@@ -89,15 +96,17 @@ export default class SC extends React.Component {
   }
 
   runLexurgy() {
-    // noinspection JSUnresolvedVariable
-    const sc = lexurgy.com.meamoria.lexurgy.sc
-    const input = new kotlin.kotlin.collections.ArrayList(this.state.input.split(/\r?\n/))
+    const input = this.splitInput()
     try {
-      const soundChanger = sc.SoundChanger.Companion.fromLsc_61zpoe$(this.state.changes)
-      const output = soundChanger.change_i6pp2q$(input).toArray()
-      this.setState({output: output.join("\n"), error: false})
+      const soundChanger = lex.SoundChanger.Companion.fromLsc(this.state.changes)
+      const stages = soundChanger.change(input).map((result) => result.words)
+      this.setState({stages: stages, error: null})
     } catch (e) {
-      this.setState({output: e.message, error: true})
+      this.setState({stages: null, error: e.message})
     }
+  }
+
+  splitInput() {
+    return this.state.input.split(/\r?\n/)
   }
 }

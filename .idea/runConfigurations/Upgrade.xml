@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Upgrade" type="NodeJSConfigurationType" path-to-js-file="upgrade.js" working-dir="$PROJECT_DIR$">
+    <method v="2" />
+  </configuration>
+</component>
