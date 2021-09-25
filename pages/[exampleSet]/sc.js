@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import SC from "../../components/sc";
 import Frame from "../../components/frame"
+import styles from "../../styles/ExampleSC.module.css"
 
 export default class ExampleSC extends React.Component {
 
@@ -22,20 +23,25 @@ export default class ExampleSC extends React.Component {
     ))
     const selectedChangesId = examples[this.state.selectedChanges].changesId
     const selectedInputId = examples[this.state.selectedChanges].inputId
+    const exampleLink = `/${this.props.exampleSet}/sc?changes=${selectedChangesId}&input=${selectedInputId}`
     return (
       <Frame>
-        <label htmlFor="lscs">Sound Changes</label>
-        <select
-          id="lscs"
-          size={3}
-          value={this.state.selectedChanges}
-          onChange={this.handleExampleSelect}
-        >
-          {options}
-        </select>
-        <Link href={`/${this.props.exampleSet}/sc?changes=${selectedChangesId}&input=${selectedInputId}`}>
-          <a className="button">Open</a>
-        </Link>
+        <div className={styles.exampleNav}>
+          <label htmlFor="lscs">Example Sound Changes</label>
+          <div className={styles.exampleMenu}>
+            <select
+              id="lscs"
+              size={3}
+              value={this.state.selectedChanges}
+              onChange={this.handleExampleSelect}
+            >
+              {options}
+            </select>
+            <Link href={exampleLink}>
+              <a className="button">Open</a>
+            </Link>
+          </div>
+        </div>
         <SC
           input={this.props.input}
           changes={this.props.changes}

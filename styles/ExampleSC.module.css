@@ -1,0 +1,12 @@
+.exampleNav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+.exampleMenu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}

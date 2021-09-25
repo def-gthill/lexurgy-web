@@ -1,5 +1,7 @@
 .main {
   justify-content: center;
+  margin-top: 2rem;
+  margin-bottom: 150px;
 }
 
 .grid {
@@ -8,7 +10,6 @@
   flex-direction: row;
   align-items: stretch;
   max-width: 1000px;
-  margin: 3rem 0;
 }
 
 .arrowContainer {

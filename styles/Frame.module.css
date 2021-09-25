@@ -51,6 +51,8 @@
   background-color: white;
   position: fixed;
   bottom: 0;
+  width: 100%;
+  text-align: center;
 }
 
 @media (max-width: 875px) {
