@@ -16,7 +16,9 @@ export default function Frame(props) {
       </Head>
 
       <header className={styles.header}>
-        <Image src="/logo.png" alt="Home" width={96} height={96} layout="fixed"/>
+        <div className={styles.logo}>
+          <Image src="/logo.png" alt="" width={96} height={96} layout="fixed"/>
+        </div>
         {/*<Link href="/">*/}
         {/*  <a>*/}
         {/*    <Image src="/logo.png" alt="Home" width={96} height={96} layout="fixed"/>*/}
