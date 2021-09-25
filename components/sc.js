@@ -3,6 +3,7 @@ import styles from "../styles/SC.module.css"
 import Editor from "../components/editor"
 import Arrow from "../components/arrow"
 import lexurgy from "../lib/lexurgy";
+import Checkdrop from "./checkdrop";
 
 // noinspection JSUnresolvedVariable
 const lex = lexurgy.com.meamoria.lexurgy
@@ -21,11 +22,23 @@ export default class SC extends React.Component {
       stages: null,
       error: null,
       outputArrows: true,
+      startAt: {
+        enabled: false,
+        chosen: null,
+      },
+      stopBefore: {
+        enabled: false,
+        chosen: null,
+      },
+      trace: {
+        enabled: false,
+        chosen: null,
+      },
     }
     this.updateEditorWith = this.updateEditorWith.bind(this)
-    this.output = this.output.bind(this)
     this.setOutputArrows = this.setOutputArrows.bind(this)
     this.runLexurgy = this.runLexurgy.bind(this)
+    this.updateCheckdrop = this.updateCheckdrop.bind(this)
   }
 
   render() {
@@ -68,8 +81,35 @@ export default class SC extends React.Component {
             <label htmlFor="showStages">Show Stages</label>
           </Editor>
         </div>
-
-        <button className="button big-button" onClick={this.runLexurgy}>Apply</button>
+        <div className={styles.controls}>
+          <div className={styles.runSettings}>
+            <Checkdrop
+              id="startAt"
+              label="Start At Rule"
+              options={this.ruleNames()}
+              enabled={this.state.startAt.enabled}
+              chosen={this.state.startAt.chosen}
+              onChange={this.updateCheckdrop}
+            />
+            <Checkdrop
+              id="stopBefore"
+              label="Stop Before Rule"
+              options={this.ruleNames()}
+              enabled={this.state.stopBefore.enabled}
+              chosen={this.state.stopBefore.chosen}
+              onChange={this.updateCheckdrop}
+            />
+            <Checkdrop
+              id="trace"
+              label="Trace Evolution"
+              options={this.inputWords()}
+              enabled={this.state.trace.enabled}
+              chosen={this.state.trace.chosen}
+              onChange={this.updateCheckdrop}
+            />
+          </div>
+          <button className="button big-button" onClick={this.runLexurgy}>Apply</button>
+        </div>
       </main>
     )
   }
@@ -84,7 +124,7 @@ export default class SC extends React.Component {
     } else if (!this.state.stages) {
       return ""
     } else if (this.state.outputArrows) {
-      const stages = [this.splitInput()].concat(this.state.stages)
+      const stages = [this.inputWords()].concat(this.state.stages)
       return lex.scMakeStageComparisons(stages).join("\n")
     } else {
       return this.state.stages.at(-1).join("\n")
@@ -96,7 +136,7 @@ export default class SC extends React.Component {
   }
 
   runLexurgy() {
-    const input = this.splitInput()
+    const input = this.inputWords()
     try {
       const soundChanger = lex.SoundChanger.Companion.fromLsc(this.state.changes)
       const stages = soundChanger.change(input).map((result) => result.words)
@@ -106,7 +146,29 @@ export default class SC extends React.Component {
     }
   }
 
-  splitInput() {
+  inputWords() {
     return this.state.input.split(/\r?\n/)
   }
+
+  ruleNames() {
+    const lines = this.state.changes.split(/\r?\n/).map(
+      (line) => line.trim()
+    )
+    const ruleNameLines = lines.filter((line) =>
+      line.endsWith(":") &&
+      !(startsWithAnyOf(
+        line.toLowerCase(),
+        ["syllables", "deromanizer", "romanizer", "then", "else"]
+      ))
+    )
+    return ruleNameLines.map((line) => line.slice(0, -1))
+  }
+
+  updateCheckdrop(id, enabled, chosen) {
+    this.setState({[id]: {enabled: enabled, chosen: chosen}})
+  }
+}
+
+function startsWithAnyOf(string, possibleStarts) {
+  return possibleStarts.some((start) => string.startsWith(start))
 }

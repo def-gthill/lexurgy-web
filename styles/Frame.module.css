@@ -46,6 +46,13 @@
   padding: 10px;
 }
 
+.footer {
+  height: 1.5rem;
+  background-color: white;
+  position: fixed;
+  bottom: 0;
+}
+
 @media (max-width: 875px) {
   .title {
     font-size: 2rem;

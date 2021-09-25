@@ -34,6 +34,15 @@
   flex: 1 0 200px;
 }
 
+.controls {
+  width: 100%;
+  background-color: white;
+  position: fixed;
+  bottom: 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
 @media (max-width: 700px) {
   .grid {
     flex-direction: column;
