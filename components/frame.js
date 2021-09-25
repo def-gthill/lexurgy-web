@@ -58,7 +58,7 @@ export default function Frame(props) {
         </div>
       </header>
 
-      {props.children}
+      <main className={styles.main}>{props.children}</main>
 
       <footer className={styles.footer}>
         Powered by <a href={releaseUrl}>Lexurgy {version}</a>

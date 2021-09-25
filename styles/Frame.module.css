@@ -46,6 +46,12 @@
   padding: 10px;
 }
 
+.main {
+  justify-content: center;
+  margin-top: 1rem;
+  margin-bottom: 150px;
+}
+
 .footer {
   height: 1.5rem;
   background-color: white;

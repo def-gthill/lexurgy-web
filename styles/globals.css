@@ -26,11 +26,6 @@ a {
 main {
   width: 90%;
   margin: auto;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
 }
 
 h1 {

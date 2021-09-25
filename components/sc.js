@@ -38,7 +38,7 @@ export default class SC extends React.Component {
 
   render() {
     return (
-      <main className={styles.main}>
+      <div className={styles.main}>
         <div className={styles.grid}>
           <Editor
             id="input"
@@ -105,7 +105,7 @@ export default class SC extends React.Component {
           </div>
           <button className="button big-button" onClick={this.runLexurgy}>Apply</button>
         </div>
-      </main>
+      </div>
     )
   }
 
