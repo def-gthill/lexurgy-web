@@ -21,19 +21,11 @@ export default class SC extends React.Component {
       changes: props.changes,
       stages: null,
       error: null,
+      traceOutput: null,
       outputArrows: true,
-      startAt: {
-        enabled: false,
-        chosen: null,
-      },
-      stopBefore: {
-        enabled: false,
-        chosen: null,
-      },
-      trace: {
-        enabled: false,
-        chosen: null,
-      },
+      startAt: new CheckdropState(),
+      stopBefore: new CheckdropState(),
+      trace: new CheckdropState(),
     }
     this.updateEditorWith = this.updateEditorWith.bind(this)
     this.setOutputArrows = this.setOutputArrows.bind(this)
@@ -123,11 +115,22 @@ export default class SC extends React.Component {
       return this.state.error
     } else if (!this.state.stages) {
       return ""
-    } else if (this.state.outputArrows) {
-      const stages = [this.inputWords()].concat(this.state.stages)
-      return lex.scMakeStageComparisons(stages).join("\n")
     } else {
-      return this.state.stages.at(-1).join("\n")
+      let inputWords = this.inputWords()
+      let stages = this.state.stages
+      let traceOutput = []
+      if (this.state.traceOutput) {
+        const traceWordIndex = inputWords.indexOf(this.state.traceOutput.word)
+        inputWords = [inputWords[traceWordIndex]]
+        stages = stages.map((stage) => [stage[traceWordIndex]])
+        traceOutput = [""].concat(this.state.traceOutput.lines)
+      }
+      if (this.state.outputArrows) {
+        const allStages = [inputWords].concat(stages)
+        return lex.scMakeStageComparisons(allStages).concat(traceOutput).join("\n")
+      } else {
+        return stages.at(-1).concat(traceOutput).join("\n")
+      }
     }
   }
 
@@ -136,14 +139,32 @@ export default class SC extends React.Component {
   }
 
   runLexurgy() {
-    const input = this.inputWords()
     try {
       const soundChanger = lex.SoundChanger.Companion.fromLsc(this.state.changes)
-      const stages = soundChanger.change(input).map((result) => result.words)
+      const stages = this.runSoundChanger(soundChanger).map((result) => result.words)
       this.setState({stages: stages, error: null})
     } catch (e) {
       this.setState({stages: null, error: e.message})
     }
+  }
+
+  runSoundChanger(soundChanger) {
+    const traceOutput = []
+    const result = soundChanger.change(
+      this.inputWords(),
+      this.state.startAt.enabledAndChosen ? this.state.startAt.chosen : null,
+      this.state.stopBefore.enabledAndChosen ? this.state.stopBefore.chosen : null,
+      this.state.trace.enabledAndChosen ? [this.state.trace.chosen] : [],
+      true,
+      ((traceLine) => traceOutput.push(traceLine))
+    )
+    this.setState({
+      traceOutput: this.state.trace.enabledAndChosen ? {
+        word: this.state.trace.chosen,
+        lines: (traceOutput || "Word didn't change"),
+      } : null}
+    )
+    return result
   }
 
   inputWords() {
@@ -165,7 +186,15 @@ export default class SC extends React.Component {
   }
 
   updateCheckdrop(id, enabled, chosen) {
-    this.setState({[id]: {enabled: enabled, chosen: chosen}})
+    this.setState({[id]: new CheckdropState(enabled, chosen)})
+  }
+}
+
+class CheckdropState {
+  constructor(enabled = false, chosen = null) {
+    this.enabled = enabled
+    this.chosen = chosen
+    this.enabledAndChosen = enabled && chosen
   }
 }
 
