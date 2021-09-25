@@ -18,18 +18,19 @@ export default class ExampleSC extends React.Component {
   render() {
     const examples = this.props.examples
     const options = examples.map((option, index) => (
-      <option
-        key={index}
-        value={index}
-        selected={index === this.state.selectedChanges}
-      >{option.name}</option>
+      <option key={index} value={index}>{option.name}</option>
     ))
     const selectedChangesId = examples[this.state.selectedChanges].changesId
     const selectedInputId = examples[this.state.selectedChanges].inputId
     return (
       <Frame>
         <label htmlFor="lscs">Sound Changes</label>
-        <select id="lscs" size={3} onChange={this.handleExampleSelect}>
+        <select
+          id="lscs"
+          size={3}
+          value={this.state.selectedChanges}
+          onChange={this.handleExampleSelect}
+        >
           {options}
         </select>
         <Link href={`/${this.props.exampleSet}/sc?changes=${selectedChangesId}&input=${selectedInputId}`}>

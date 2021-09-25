@@ -108,6 +108,7 @@ export default class SC extends React.Component {
 
   updateEditorWith(id, newValue) {
     this.setState({[id]: newValue})
+    this.updateAllCheckdrops()
   }
 
   output() {
@@ -188,6 +189,12 @@ export default class SC extends React.Component {
   updateCheckdrop(id, enabled, chosen) {
     this.setState({[id]: new CheckdropState(enabled, chosen)})
   }
+
+  updateAllCheckdrops() {
+    this.setState({startAt: this.state.startAt.check(this.ruleNames())})
+    this.setState({stopBefore: this.state.stopBefore.check(this.ruleNames())})
+    this.setState({trace: this.state.trace.check(this.inputWords())})
+  }
 }
 
 class CheckdropState {
@@ -195,6 +202,13 @@ class CheckdropState {
     this.enabled = enabled
     this.chosen = chosen
     this.enabledAndChosen = enabled && chosen
+  }
+
+  check(options) {
+    return new CheckdropState(
+      this.enabled,
+      options.includes(this.chosen) ? this.chosen : null
+    )
   }
 }
 

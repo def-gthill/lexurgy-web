@@ -10,11 +10,7 @@ export default class Checkdrop extends React.Component {
 
   render() {
     const options = this.props.options.map((option, index) => (
-      <option
-        key={index}
-        value={option}
-        selected={option === this.props.chosen}
-      >{option}</option>
+      <option key={index} value={option}>{option}</option>
     ))
     return (
       <div className={styles.checkdrop}>
@@ -25,7 +21,11 @@ export default class Checkdrop extends React.Component {
           onChange={this.updateEnabled}
         />
         <label htmlFor={this.props.id}>{this.props.label}</label>
-        <select onChange={this.updateChosen} disabled={!this.props.enabled}>
+        <select
+          onChange={this.updateChosen}
+          value={this.props.chosen || "$none"}
+          disabled={!this.props.enabled}>
+          <option value="$none" disabled>Choose one</option>
           {options}
         </select>
       </div>
@@ -44,7 +44,7 @@ export default class Checkdrop extends React.Component {
     this.props.onChange(
       this.props.id,
       this.props.enabled,
-      event.target.value,
+      event.target.value === "$none" ? null : event.target.value,
     )
   }
 }
