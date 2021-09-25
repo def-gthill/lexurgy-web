@@ -19,9 +19,12 @@ export default class SC extends React.Component {
     this.state = {
       input: props.input,
       changes: props.changes,
-      stages: null,
-      error: null,
-      traceOutput: null,
+      runResult: {
+        input: null,
+        stages: null,
+        error: null,
+        traceOutput: null,
+      },
       outputArrows: true,
       startAt: new CheckdropState(),
       stopBefore: new CheckdropState(),
@@ -58,10 +61,10 @@ export default class SC extends React.Component {
           <Editor
             id="output"
             label="Output"
-            value={this.output()}
+            value={this.output(this.state)}
             updateValue={this.updateEditorWith}
             editable={false}
-            wrap={this.state.error}
+            wrap={this.state.runResult.error}
             styles={`${styles.stackedEditor} ${styles.outputContainer}`}
           >
             <input
@@ -78,7 +81,7 @@ export default class SC extends React.Component {
             <Checkdrop
               id="startAt"
               label="Start At Rule"
-              options={this.ruleNames()}
+              options={this.ruleNames(this.state)}
               enabled={this.state.startAt.enabled}
               chosen={this.state.startAt.chosen}
               onChange={this.updateCheckdrop}
@@ -86,7 +89,7 @@ export default class SC extends React.Component {
             <Checkdrop
               id="stopBefore"
               label="Stop Before Rule"
-              options={this.ruleNames()}
+              options={this.ruleNames(this.state)}
               enabled={this.state.stopBefore.enabled}
               chosen={this.state.stopBefore.chosen}
               onChange={this.updateCheckdrop}
@@ -94,7 +97,7 @@ export default class SC extends React.Component {
             <Checkdrop
               id="trace"
               label="Trace Evolution"
-              options={this.inputWords()}
+              options={this.inputWords(this.state)}
               enabled={this.state.trace.enabled}
               chosen={this.state.trace.chosen}
               onChange={this.updateCheckdrop}
@@ -108,31 +111,7 @@ export default class SC extends React.Component {
 
   updateEditorWith(id, newValue) {
     this.setState({[id]: newValue})
-    this.updateAllCheckdrops()
-  }
-
-  output() {
-    if (this.state.error) {
-      return this.state.error
-    } else if (!this.state.stages) {
-      return ""
-    } else {
-      let inputWords = this.inputWords()
-      let stages = this.state.stages
-      let traceOutput = []
-      if (this.state.traceOutput) {
-        const traceWordIndex = inputWords.indexOf(this.state.traceOutput.word)
-        inputWords = [inputWords[traceWordIndex]]
-        stages = stages.map((stage) => [stage[traceWordIndex]])
-        traceOutput = [""].concat(this.state.traceOutput.lines)
-      }
-      if (this.state.outputArrows) {
-        const allStages = [inputWords].concat(stages)
-        return lex.scMakeStageComparisons(allStages).concat(traceOutput).join("\n")
-      } else {
-        return stages.at(-1).concat(traceOutput).join("\n")
-      }
-    }
+    this.setState((state) => this.updateAllCheckdrops(state))
   }
 
   setOutputArrows(event) {
@@ -140,40 +119,52 @@ export default class SC extends React.Component {
   }
 
   runLexurgy() {
-    try {
-      const soundChanger = lex.SoundChanger.Companion.fromLsc(this.state.changes)
-      const stages = this.runSoundChanger(soundChanger).map((result) => result.words)
-      this.setState({stages: stages, error: null})
-    } catch (e) {
-      this.setState({stages: null, error: e.message})
+    this.setState((state) => {
+      const inputWords = this.inputWords(state)
+      try {
+        const soundChanger = lex.SoundChanger.Companion.fromLsc(state.changes)
+        const { result, traceOutput } = this.runSoundChanger(state, soundChanger)
+        const stages = result.map((result) => result.words)
+        return {
+          runResult: {
+            input: inputWords,
+            stages: stages,
+            error: null,
+            traceOutput: traceOutput
+          }
+        }
+      } catch (e) {
+        return {
+          runResult: {
+            input: inputWords,
+            stages: null,
+            error: e.message,
+            traceOutput: null,
+          }
+        }
+      }
+    })
+  }
+
+  updateCheckdrop(id, enabled, chosen) {
+    this.setState({[id]: new CheckdropState(enabled, chosen)})
+  }
+
+
+  updateAllCheckdrops(state) {
+    return {
+      startAt: state.startAt.check(this.ruleNames(state)),
+      stopBefore: state.stopBefore.check(this.ruleNames(state)),
+      trace: state.trace.check(this.inputWords(state)),
     }
   }
 
-  runSoundChanger(soundChanger) {
-    const traceOutput = []
-    const result = soundChanger.change(
-      this.inputWords(),
-      this.state.startAt.enabledAndChosen ? this.state.startAt.chosen : null,
-      this.state.stopBefore.enabledAndChosen ? this.state.stopBefore.chosen : null,
-      this.state.trace.enabledAndChosen ? [this.state.trace.chosen] : [],
-      true,
-      ((traceLine) => traceOutput.push(traceLine))
-    )
-    this.setState({
-      traceOutput: this.state.trace.enabledAndChosen ? {
-        word: this.state.trace.chosen,
-        lines: (traceOutput || "Word didn't change"),
-      } : null}
-    )
-    return result
+  inputWords(state) {
+    return state.input.split(/\r?\n/)
   }
 
-  inputWords() {
-    return this.state.input.split(/\r?\n/)
-  }
-
-  ruleNames() {
-    const lines = this.state.changes.split(/\r?\n/).map(
+  ruleNames(state) {
+    const lines = state.changes.split(/\r?\n/).map(
       (line) => line.trim()
     )
     const ruleNameLines = lines.filter((line) =>
@@ -186,14 +177,48 @@ export default class SC extends React.Component {
     return ruleNameLines.map((line) => line.slice(0, -1))
   }
 
-  updateCheckdrop(id, enabled, chosen) {
-    this.setState({[id]: new CheckdropState(enabled, chosen)})
+  output(state) {
+    const runResult = state.runResult
+    if (runResult.error) {
+      return runResult.error
+    } else if (!runResult.stages) {
+      return ""
+    } else {
+      let inputWords = runResult.input
+      let stages = runResult.stages
+      let traceOutput = []
+      if (runResult.traceOutput) {
+        const traceWordIndex = inputWords.indexOf(runResult.traceOutput.word)
+        inputWords = [inputWords[traceWordIndex]]
+        stages = stages.map((stage) => [stage[traceWordIndex]])
+        traceOutput = [""].concat(runResult.traceOutput.lines)
+      }
+      if (state.outputArrows) {
+        const allStages = [inputWords].concat(stages)
+        return lex.scMakeStageComparisons(allStages).concat(traceOutput).join("\n")
+      } else {
+        return stages.at(-1).concat(traceOutput).join("\n")
+      }
+    }
   }
 
-  updateAllCheckdrops() {
-    this.setState({startAt: this.state.startAt.check(this.ruleNames())})
-    this.setState({stopBefore: this.state.stopBefore.check(this.ruleNames())})
-    this.setState({trace: this.state.trace.check(this.inputWords())})
+  runSoundChanger(state, soundChanger) {
+    const traceOutput = []
+    const result = soundChanger.change(
+      this.inputWords(state),
+      state.startAt.enabledAndChosen ? state.startAt.chosen : null,
+      state.stopBefore.enabledAndChosen ? state.stopBefore.chosen : null,
+      state.trace.enabledAndChosen ? [state.trace.chosen] : [],
+      true,
+      ((traceLine) => traceOutput.push(traceLine))
+    )
+    return {
+      result: result,
+      traceOutput: state.trace.enabledAndChosen ? {
+        word: state.trace.chosen,
+        lines: (traceOutput || "Word didn't change"),
+      } : null
+    }
   }
 }
 
