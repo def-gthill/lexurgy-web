@@ -38,6 +38,13 @@
   flex: 1 0 200px;
 }
 
+.showStages {
+  border-color: #645E9D;
+  border-style: solid;
+  border-width: 3px;
+  padding: 7px;
+}
+
 .controls {
   width: 100%;
   background-color: white;

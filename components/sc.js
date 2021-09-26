@@ -67,13 +67,15 @@ export default class SC extends React.Component {
             wrap={this.state.runResult.error}
             styles={`${styles.stackedEditor} ${styles.outputContainer}`}
           >
-            <input
-              id="showStages"
-              type="checkbox"
-              checked={this.state.outputArrows}
-              onChange={this.setOutputArrows}
-            />
-            <label htmlFor="showStages">Show Stages</label>
+            <div className={styles.showStages}>
+              <input
+                id="showStages"
+                type="checkbox"
+                checked={this.state.outputArrows}
+                onChange={this.setOutputArrows}
+              />
+              <label htmlFor="showStages">Show Stages</label>
+            </div>
           </Editor>
         </div>
         <div className={styles.controls}>
