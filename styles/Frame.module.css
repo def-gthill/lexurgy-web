@@ -102,9 +102,14 @@
   }
 }
 
-@media (max-width: 450px) {
+@media (max-width: 475px) {
   .header {
     flex-wrap: wrap;
+  }
+
+  .title {
+    padding-left: 10px;
+    padding-right: 50px;
   }
 
   .spacer {
