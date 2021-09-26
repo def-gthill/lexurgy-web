@@ -62,9 +62,9 @@ export default class Editor extends React.Component {
     }
   }
 
-  save(event) {
+  save() {
     const a = document.createElement('a')
-    const file = new Blob([event.target.value], {type: 'text/plain'})
+    const file = new Blob([this.props.value], {type: 'text/plain'})
 
     a.href = URL.createObjectURL(file)
     a.download = "lexurgy" + this.props.expectedFileType

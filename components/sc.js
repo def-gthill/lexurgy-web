@@ -63,6 +63,7 @@ export default class SC extends React.Component {
             label="Output"
             value={this.output(this.state)}
             updateValue={this.updateEditorWith}
+            expectedFileType={this.state.outputArrows ? ".wlm" : ".wli"}
             editable={false}
             wrap={this.state.runResult.error}
             styles={`${styles.stackedEditor} ${styles.outputContainer}`}
