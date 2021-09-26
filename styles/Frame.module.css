@@ -51,6 +51,10 @@
   padding: 10px;
 }
 
+.menuList a:hover {
+  background-color: #65AFFF;
+}
+
 .main {
   justify-content: center;
   margin-top: 1rem;
@@ -95,10 +99,6 @@
     display: block;
     width: 100%;
     text-align: right;
-  }
-
-  .menuList a:hover {
-    background-color: #65AFFF;
   }
 }
 
