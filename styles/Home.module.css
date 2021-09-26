@@ -9,5 +9,5 @@
   align-items: stretch;
   justify-content: center;
   max-width: 1000px;
-  margin-top: 3rem;
+  margin: 3rem auto 0;
 }
