@@ -79,7 +79,7 @@ export default class SC extends React.Component {
           </Editor>
         </div>
         <div className={styles.controls}>
-          <div className={styles.runSettings}>
+          <div>
             <Checkdrop
               id="startAt"
               label="Start At Rule"
