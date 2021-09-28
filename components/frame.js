@@ -52,6 +52,12 @@ export default function Frame(props) {
             </li>
             <li>
               <a
+                href="https://ko-fi.com/meamoria"
+                target="_blank" rel="noreferrer"
+              >Donate</a>
+            </li>
+            <li>
+              <a
                 href="https://www.meamoria.com/contact-me/"
                 target="_blank" rel="noreferrer"
               >Contact</a>
