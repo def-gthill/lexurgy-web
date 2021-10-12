@@ -9,14 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "kotlin": "1.5.30",
     "next": "11.1.0",
     "react": "17.0.2",
-    "react-dom": "17.0.2",
-    "kotlin": "1.5.30"
+    "react-dom": "17.0.2"
   },
   "devDependencies": {
+    "copy-webpack-plugin": "9.0.1",
     "eslint": "7.32.0",
-    "eslint-config-next": "11.1.0",
-    "copy-webpack-plugin": "9.0.1"
+    "eslint-config-next": "11.1.0"
   }
 }

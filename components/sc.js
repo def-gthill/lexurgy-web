@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "../styles/SC.module.css"
 import Editor from "../components/editor"
+import CodeEditor from "../components/codeEditor"
 import Arrow from "../components/arrow"
 import lexurgy from "../lib/lexurgy";
 import Checkdrop from "./checkdrop";
@@ -49,7 +50,7 @@ export default class SC extends React.Component {
             styles={`${styles.stackedEditor} ${styles.inputContainer}`}
           />
           <Arrow/>
-          <Editor
+          <CodeEditor
             id="changes"
             label="Sound Changes"
             value={this.state.changes}

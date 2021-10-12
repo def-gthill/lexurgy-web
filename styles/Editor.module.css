@@ -7,9 +7,15 @@
 .editor {
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
-.editor textarea {
+.lineNumber {
+  position: absolute;
+  right: 0;
+}
+
+.editor textarea, .editor code {
   height: 30rem;
   resize: none;
   white-space: pre;
