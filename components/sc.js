@@ -56,6 +56,7 @@ export default class SC extends React.Component {
             updateValue={this.updateEditorWith}
             expectedFileType=".lsc"
             styles={`${styles.stackedEditor} ${styles.changesContainer}`}
+            showLineNumbers
           />
           <Arrow/>
           <Editor

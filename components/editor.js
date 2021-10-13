@@ -11,23 +11,53 @@ export default class Editor extends React.Component {
     super(props);
     this.handleChange = this.handleChange.bind(this)
     this.promptForFile = this.promptForFile.bind(this)
+    this.handleCaretMove = this.handleCaretMove.bind(this)
     this.loadRef = React.createRef();
     this.save = this.save.bind(this)
+
+    this.lineNumber = null;
   }
 
   render() {
+    let lineNumber;
+    let textarea = <textarea
+      id={this.props.id}
+      value={this.props.value}
+      onChange={this.handleChange}
+      readOnly={!this.props.editable}
+      cols={1}
+      spellCheck={false}
+      style={this.props.wrap ? {whiteSpace: "normal"} : {}}
+    />;
+
+    if (this.props.showLineNumbers) {
+      lineNumber = <span
+        className={styles.lineNumber}
+        id={`${this.props.id}_line`}
+      >
+        Line 1
+      </span>
+
+      textarea = <textarea
+        id={this.props.id}
+        value={this.props.value}
+        onMouseDown={this.handleCaretMove}
+        onMouseUp={this.handleCaretMove}
+        onKeyDown={this.handleCaretMove}
+        onKeyUp={this.handleCaretMove}
+        onChange={this.handleChange}
+        readOnly={!this.props.editable}
+        cols={1}
+        spellCheck={false}
+        style={this.props.wrap ? {whiteSpace: "normal"} : {}}
+      />
+    }
+
     return (
       <div className={`${styles.editor} ${this.props.styles}`}>
         <label htmlFor={this.props.id}>{this.props.label}</label>
-        <textarea
-          id={this.props.id}
-          value={this.props.value}
-          onChange={this.handleChange}
-          readOnly={!this.props.editable}
-          cols={1}
-          spellCheck={false}
-          style={this.props.wrap ? {whiteSpace: "normal"} : {}}
-        />
+        {lineNumber}
+        {textarea}
         <div className={styles.buttonContainer}>
           {this.props.children}
           {this.props.editable && <>
@@ -45,6 +75,18 @@ export default class Editor extends React.Component {
         </div>
       </div>
     )
+  }
+
+  handleCaretMove(event) {
+    const textarea = event.currentTarget
+    const textBeforeCaret = textarea.value.slice(0, textarea.selectionStart);
+    const lineBreaksBeforeCaret = textBeforeCaret.match(/\r?\n/gu)?.length ?? 0;
+
+    if (!this.lineNumber) {
+      this.lineNumber = document.getElementById(`${this.props.id}_line`)
+    }
+
+    this.lineNumber.innerHTML = `Line ${lineBreaksBeforeCaret + 1}`;
   }
 
   handleChange(event) {
