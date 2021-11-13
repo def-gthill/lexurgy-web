@@ -218,7 +218,7 @@ export default class SC extends React.Component {
       if (state.outputInputs) {
         allStages = this.addInputs(allStages, inputWords)
       }
-      if (state.outputArrows && !state.outputInputs) {
+      if (state.outputArrows && !state.outputInputs && allStages.length > 1) {
         allStages = this.addLeadingArrows(allStages)
       }
       return lex.scMakeStageComparisons(allStages).concat(traceOutput).join("\n")
