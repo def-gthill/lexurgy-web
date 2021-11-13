@@ -25,12 +25,14 @@ export default class SC extends React.Component {
         error: null,
         traceOutput: null,
       },
+      outputInputs: true,
       outputArrows: true,
       startAt: new CheckdropState(),
       stopBefore: new CheckdropState(),
       trace: new CheckdropState(),
     }
     this.updateEditorWith = this.updateEditorWith.bind(this)
+    this.setOutputInputs = this.setOutputInputs.bind(this)
     this.setOutputArrows = this.setOutputArrows.bind(this)
     this.runLexurgy = this.runLexurgy.bind(this)
     this.updateCheckdrop = this.updateCheckdrop.bind(this)
@@ -70,13 +72,21 @@ export default class SC extends React.Component {
             styles={`${styles.stackedEditor} ${styles.outputContainer}`}
           >
             <div className={styles.showStages}>
+              <div>Show:</div>
+              <input
+                id="showInputs"
+                type="checkbox"
+                checked={this.state.outputInputs}
+                onChange={this.setOutputInputs}
+              />
+              <label htmlFor="showInputs">Inputs</label>
               <input
                 id="showStages"
                 type="checkbox"
                 checked={this.state.outputArrows}
                 onChange={this.setOutputArrows}
               />
-              <label htmlFor="showStages">Show Stages</label>
+              <label htmlFor="showStages">Stages</label>
             </div>
           </Editor>
         </div>
@@ -116,6 +126,10 @@ export default class SC extends React.Component {
   updateEditorWith(id, newValue) {
     this.setState({[id]: newValue})
     this.setState((state) => this.updateAllCheckdrops(state))
+  }
+
+  setOutputInputs(event) {
+    this.setState({outputInputs: event.target.checked})
   }
 
   setOutputArrows(event) {
@@ -197,13 +211,30 @@ export default class SC extends React.Component {
         stages = stages.map((stage) => [stage[traceWordIndex]])
         traceOutput = [""].concat(runResult.traceOutput.lines)
       }
-      if (state.outputArrows) {
-        const allStages = [inputWords].concat(stages)
-        return lex.scMakeStageComparisons(allStages).concat(traceOutput).join("\n")
-      } else {
-        return stages.at(-1).concat(traceOutput).join("\n")
+      let allStages = stages
+      if (!state.outputArrows) {
+        allStages = this.removeIntermediates(allStages)
       }
+      if (state.outputInputs) {
+        allStages = this.addInputs(allStages, inputWords)
+      }
+      if (state.outputArrows && !state.outputInputs) {
+        allStages = this.addLeadingArrows(allStages)
+      }
+      return lex.scMakeStageComparisons(allStages).concat(traceOutput).join("\n")
     }
+  }
+
+  removeIntermediates(stages) {
+    return [stages.at(-1)]
+  }
+
+  addInputs(stages, inputWords) {
+    return [inputWords].concat(stages)
+  }
+
+  addLeadingArrows(stages) {
+    return [Array(stages[0].length).fill("")].concat(stages)
   }
 
   runSoundChanger(state, soundChanger) {
