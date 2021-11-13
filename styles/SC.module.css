@@ -35,7 +35,7 @@
 }
 
 .outputContainer {
-  flex: 1 0 200px;
+  flex: 1 0 250px;
 }
 
 .showStages {
@@ -43,6 +43,10 @@
   border-style: solid;
   border-width: 3px;
   padding: 7px;
+}
+
+.showStages input {
+  margin-left: 10px;
 }
 
 .controls {
@@ -56,6 +60,16 @@
   align-items: center;
   padding: 10px 30px 20px;
   gap: 30px;
+}
+
+@media (min-width: 700px) and (max-width: 1200px) {
+  .showStagesLabel {
+    display: none;
+  }
+
+  .showStages input:first-of-type {
+    margin-left: 0;
+  }
 }
 
 @media (max-width: 700px) {

@@ -72,7 +72,7 @@ export default class SC extends React.Component {
             styles={`${styles.stackedEditor} ${styles.outputContainer}`}
           >
             <div className={styles.showStages}>
-              <div>Show:</div>
+              <span className={styles.showStagesLabel}>Show:</span>
               <input
                 id="showInputs"
                 type="checkbox"
