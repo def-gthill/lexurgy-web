@@ -19,6 +19,7 @@
   height: 30rem;
   resize: none;
   white-space: pre;
+  word-wrap: normal;
   font-family: "SFMono-Regular", "Consolas", "Menlo", "Liberation Mono", "Ubuntu Mono", "FreeMono", monospace;
   text-rendering: optimizeLegibility !important;
 }
