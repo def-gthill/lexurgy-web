@@ -192,7 +192,7 @@ export default class SC extends React.Component {
         ["syllables", "deromanizer", "romanizer", "then", "else"]
       ))
     )
-    return ruleNameLines.map((line) => line.slice(0, -1))
+    return ruleNameLines.map((line) => line.slice(0, -1).split(/\s+/)[0])
   }
 
   output(state) {
