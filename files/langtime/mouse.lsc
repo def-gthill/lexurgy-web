@@ -1,10 +1,10 @@
 Feature +ejective
 Feature +long, hightone, +nasalized
 Diacritic ʼ [+ejective]
-Diacritic ː (floating) [+long]
 Diacritic ́  (floating) [+hightone]
 Diacritic ̀  (floating) [-hightone]
 Diacritic ̃  (floating) [+nasalized]
+Diacritic ː (floating) [+long]
 Symbol ts, tʃ, bv, dz, dʒ
 Class glide {w, j, ɥ}
 Class nasal {m, n, ɲ, ŋ}
