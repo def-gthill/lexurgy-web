@@ -3,7 +3,7 @@ import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
 
-const version = "1.0.4"
+const version = "1.0.5"
 const releaseUrl = "https://github.com/def-gthill/lexurgy/releases/tag/v" + version
 
 export default function Frame(props) {
