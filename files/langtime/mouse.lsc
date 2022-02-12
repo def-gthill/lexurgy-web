@@ -44,9 +44,12 @@ coda-changes-early:
     @vowel s => [-hightone +long] * / _ .
     @vowel {p, t, ts, k} => [+hightone] ʔ / _ .
     {ic, ec, uc, oc, ac} => {íʔ, íʔ, ýʔ, ýʔ, éʔ} / _ .
-    @vowel {m, n, ɲ, ŋ} => [+nasalized] * / _ .
+    @vowel => [+nasalized] / _ {m, n, ɲ, ŋ} .
     Then:
+    {ã, ẽ, ĩ, õ, ũ} => {ẽ, ĩ, ĩ, ỹ, ỹ} / _ ɲ .
     {ĩ, ũ} => {ẽ, õ}
+    Then:
+    {m, n, ɲ, ŋ} => * / _ .
 
 palatal-simplification:
     j => * / {ʒ, ɲ} _
