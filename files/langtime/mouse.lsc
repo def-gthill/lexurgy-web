@@ -52,7 +52,7 @@ coda-changes-early:
     {m, n, ɲ, ŋ} => * / _ .
 
 palatal-simplification:
-    j => * / {ʒ, ɲ} _
+    j => * / {c, cʼ, dʒ, ʒ, ɲ} _
 
 hiatus-resolution-late:
     {iː, ei, eu, æ, yː, oi, ou, ɑ, ai, au, aː} => {i, i, y, e, y, we, u, o, e, o, a}
