@@ -17,7 +17,7 @@ deromanizer literal:
  r => ɹ
 
 Syllables:
-    {@cons, (@cons // @vowel _)? @glide, (* / $ _)} @vowel {@vowel, @cons&[-ejective]}?
+    {@cons, ({@cons / @vowel @vowel _, @cons // @vowel _})? @glide, (* / $ _)} @vowel {@vowel, @cons&[-ejective]}?
 
 fricative-voicing:
     {s, f} => {z, v} / @sonorant _
