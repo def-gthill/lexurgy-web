@@ -1,0 +1,28 @@
+Feature +nasalized
+Diacritic  ̃ (floating) [+nasalized]
+
+Class vowel {i, y, ɨ, u, e, ø, ə, o, ɛ, œ, ɔ, æ, ɑ}
+Class nasal {m, n, ɲ, ŋ, ɴ}
+
+nasal-assimilation:
+    @nasal => m / _ {m, w, b}
+    @nasal => n / _ {t, d, s, z, l, r, n}
+    @nasal => ɲ / _ j
+    @nasal => ŋ / _ {k, x}
+    @nasal => ɴ / _ {q, ʀ}
+
+post-glide-central-vowel-annihilation:
+    {wɨ, jɨ} => {wu, ji}
+
+vowel-glide-merger:
+    {ɨ, e, ə, o, ɑ} w => {u, ø, o, u, o} *
+    {ɨ, e, æ, ə, o} j => {i, i, e, e, y} *
+
+vowel-lowering-backing:
+    {i, y, ɨ, u, e, ø, ə, o, æ} => {e, ø, ə, o, ɛ, œ, ɑ, ɔ, ɑ} / {{q, ʀ} _, _ {q, ʀ}}
+
+pre-nasal-neutralization:
+    {æ, ɑ, i, y, ɨ, u} => {e, o, e, ø, ə, o} / _ @nasal
+
+nasalization:
+    @vowel @nasal => [+nasalized] * // _ @vowel

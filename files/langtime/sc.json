@@ -17,6 +17,12 @@
       "name": "Wokuthízhű (Mice)",
       "file": "mouse.lsc",
       "inputs": [3]
+    },
+    {
+      "id": 4,
+      "name": "Catlang",
+      "file": "cat.lsc",
+      "inputs": [4]
     }
   ],
   "wordlists": [
@@ -34,6 +40,11 @@
       "id": 3,
       "name": "Proto-Mouse",
       "file": "mouse.wli"
+    },
+    {
+      "id": 4,
+      "name": "Proto-Cat",
+      "file": "cat.wli"
     }
   ]
 }
