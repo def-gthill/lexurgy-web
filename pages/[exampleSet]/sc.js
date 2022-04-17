@@ -1,5 +1,3 @@
-import path from "path";
-import { promises as fs } from "fs";
 import React from "react";
 import Link from "next/link";
 import SC from "../../components/sc";
@@ -61,98 +59,148 @@ const notFound = {
   notFound: true
 }
 
+class QueryResult {
+  constructor(query) {
+    this.query = query
+  }
+
+  map(f) {
+    return new QueryResult(async () => {
+      const result = await this.query()
+      if (result.error) {
+        return result
+      } else {
+        return {
+          data: f(result.data),
+          error: result.error
+        }
+      }
+    })
+  }
+
+  flatMap(f) {
+    return new QueryResult(async () => {
+      const result = await this.query()
+      if (result.error) {
+        return result
+      } else {
+        return await f(result.data).query()
+      }
+    })
+  }
+
+  static always(data) {
+    return new QueryResult(() =>
+      ({data: data, error: null})
+    )
+  }
+
+  async unpack() {
+    const result = await this.query()
+    if (result.error) {
+      return notFound
+    } else {
+      return result.data
+    }
+  }
+}
+
 export async function getServerSideProps(context) {
   // noinspection JSUnresolvedVariable
   const workspaceName = context.params.exampleSet
-  const props = {
+  const initialProps = {
     exampleSet: workspaceName
   }
 
-  const workspaceId = await getWorkspaceId(workspaceName)
-  Object.assign(
-    props,
-    await propsFromWorkspaceId(workspaceId)
+  const props = getWorkspaceId(workspaceName).flatMap(workspaceId =>
+    propsFromWorkspaceId(workspaceId).map(workspaceProps =>
+      ({...initialProps, ...workspaceProps})
+    ).flatMap(props => {
+      if (context.query.changes && context.query.input) {
+        return propsFromChangesAndInput(
+          workspaceId,
+          context.query.changes,
+          context.query.input,
+        ).map(historyProps =>
+          ({...props, ...historyProps})
+        )
+      } else if (context.query.historyId) {
+        return propsFromHistory(
+          workspaceId,
+          context.query.historyId,
+        ).map(historyProps =>
+          ({...props, ...historyProps})
+        )
+      } else {
+        return QueryResult.always(props)
+      }
+    })
   )
 
-  if (context.query.changes && context.query.input) {
-    Object.assign(
-      props,
-      await propsFromChangesAndInput(
-        workspaceId,
-        context.query.changes,
-        context.query.input,
-      )
-    )
-  } else if (context.query.historyId) {
-    Object.assign(
-      props,
-      await propsFromHistory(
-        workspaceId,
-        context.query.historyId,
-      )
-    )
-  }
-
-  return {
-    props: props
-  }
+  return props.map(props =>
+    ({props: props})
+  ).unpack()
 }
 
-async function getWorkspaceId(workspaceName) {
-  let { data, error, status } = await supabase
-    .from("workspaces")
-    .select("id")
-    .eq("name", workspaceName)
-    .single()
-
-  return data.id
+function getWorkspaceId(workspaceName) {
+  return new QueryResult(async () =>
+    await supabase
+      .from("workspaces")
+      .select("id")
+      .eq("name", workspaceName)
+      .single()
+  ).map(data => data.id)
 }
 
-async function propsFromWorkspaceId(workspaceId) {
-  let { data, error, status } = await supabase
-    .from("histories")
-    .select("*, changes (local_number, name), input_id (local_number)")
-    .eq("workspace_id", workspaceId)
+function propsFromWorkspaceId(workspaceId) {
+  return new QueryResult(async () =>
+    await supabase
+      .from("histories")
+      .select("*, changes (local_number, name), input_id (local_number)")
+      .eq("workspace_id", workspaceId)
+  ).map(data => ({
+      examples: data.map(row => ({
+          name: row.name || row.changes.name,
+          changesId: row.changes.local_number,
+          inputId: row.input_id.local_number,
+        })
+      )
+    })
+  )
+}
 
-  return {
-    examples: data.map(row => ({
-        name: row.name || row.changes.name,
-        changesId: row.changes.local_number,
-        inputId: row.input_id.local_number,
+function propsFromChangesAndInput(workspaceId, changesId, inputId) {
+  return getChanges(workspaceId, changesId).flatMap(changes =>
+    getInput(workspaceId, inputId).map(input => ({
+        changesId: changesId,
+        changes: changes,
+        inputId: inputId,
+        input: input,
       })
     )
-  }
+  )
 }
 
-async function propsFromChangesAndInput(workspaceId, changesId, inputId) {
-  return {
-    changesId: changesId,
-    changes: await getChanges(workspaceId, changesId),
-    inputId: inputId,
-    input: await getInput(workspaceId, inputId),
-  }
+function getChanges(workspaceId, changesId) {
+  return new QueryResult(async () =>
+    await supabase
+      .from("changes")
+      .select("rules")
+      .eq("workspace_id", workspaceId)
+      .eq("local_number", changesId)
+      .single()
+  ).map(data => data.rules)
 }
 
-async function getChanges(workspaceId, changesId) {
-  let {data, error, status} = await supabase
-    .from("changes")
-    .select("rules")
-    .eq("workspace_id", workspaceId)
-    .eq("local_number", changesId)
-    .single()
-
-  return data.rules
-}
-
-async function getInput(workspaceId, inputId) {
-  let {data, error, status} = await supabase
-    .from("wordlists")
-    .select("words")
-    .eq("workspace_id", workspaceId)
-    .eq("local_number", inputId)
-    .single()
-
-  return data.words
+function getInput(workspaceId, inputId) {
+  return new QueryResult(async () =>
+    await supabase
+      .from("wordlists")
+      .select("words")
+      .eq("workspace_id", workspaceId)
+      .eq("local_number", inputId)
+      .single()
+  ).map(data => data.words)
 }
 
 async function propsFromHistory(workspaceId, historyId) {
