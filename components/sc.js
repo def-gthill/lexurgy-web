@@ -16,6 +16,8 @@ export default class SC extends React.Component {
 
   constructor(props) {
     super(props);
+    this.gridRef = React.createRef()
+    this.controlsRef = React.createRef()
     this.state = {
       input: props.input,
       changes: props.changes,
@@ -31,6 +33,7 @@ export default class SC extends React.Component {
       stopBefore: new CheckdropState(),
       trace: new CheckdropState(),
     }
+    this.avoidControlOverlap = this.avoidControlOverlap.bind(this)
     this.updateEditorWith = this.updateEditorWith.bind(this)
     this.setOutputInputs = this.setOutputInputs.bind(this)
     this.setOutputArrows = this.setOutputArrows.bind(this)
@@ -38,10 +41,26 @@ export default class SC extends React.Component {
     this.updateCheckdrop = this.updateCheckdrop.bind(this)
   }
 
+  componentDidMount() {
+    this.avoidControlOverlap()
+    window.addEventListener("resize", this.avoidControlOverlap)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.avoidControlOverlap)
+  }
+
+  avoidControlOverlap() {
+    const controls = this.controlsRef.current
+    const height = controls.offsetHeight
+    const grid = this.gridRef.current
+    grid.style.marginBottom = `${height + 50}px`
+  }
+
   render() {
     return (
       <div className={styles.main}>
-        <div className={styles.grid}>
+        <div className={styles.grid} ref={this.gridRef}>
           <Editor
             id="input"
             label="Input Words"
@@ -90,7 +109,7 @@ export default class SC extends React.Component {
             </div>
           </Editor>
         </div>
-        <div className={styles.controls}>
+        <div className={styles.controls} ref={this.controlsRef}>
           <div>
             <Checkdrop
               id="startAt"
