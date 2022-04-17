@@ -111,14 +111,14 @@ async function getWorkspaceId(workspaceName) {
 async function propsFromWorkspaceId(workspaceId) {
   let { data, error, status } = await supabase
     .from("histories")
-    .select("*, changes (name)")
+    .select("*, changes (local_number, name), input_id (local_number)")
     .eq("workspace_id", workspaceId)
 
   return {
     examples: data.map(row => ({
         name: row.name || row.changes.name,
-        changesId: row.changes_id,
-        inputId: row.input_id,
+        changesId: row.changes.local_number,
+        inputId: row.input_id.local_number,
       })
     )
   }
