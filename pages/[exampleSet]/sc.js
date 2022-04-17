@@ -5,6 +5,7 @@ import Link from "next/link";
 import SC from "../../components/sc";
 import Frame from "../../components/frame"
 import styles from "../../styles/ExampleSC.module.css"
+import {supabase} from "../../utils/supabaseClient";
 
 export default class ExampleSC extends React.Component {
 
@@ -62,85 +63,98 @@ const notFound = {
 
 export async function getServerSideProps(context) {
   // noinspection JSUnresolvedVariable
-  const exampleSet = context.params.exampleSet
-  const exampleDirectory = getExampleDirectory(exampleSet)
-
-  const exampleJson = await readExampleJson(exampleDirectory).catch(() => {})
-  if (!exampleJson) {
-    return notFound
+  const workspaceName = context.params.exampleSet
+  const props = {
+    exampleSet: workspaceName
   }
 
-  const examples = exampleJsonToExamples(exampleJson)
+  const workspaceId = await getWorkspaceId(workspaceName)
+  Object.assign(
+    props,
+    await propsFromWorkspaceId(workspaceId)
+  )
 
-  if (!context.query.changes && !context.query.input) {
-    return {
-      props: {
-        exampleSet: exampleSet,
-        examples: examples,
-      }
-    }
+  if (context.query.changes && context.query.input) {
+    Object.assign(
+      props,
+      await propsFromChangesAndInput(
+        workspaceId,
+        context.query.changes,
+        context.query.input,
+      )
+    )
+  } else if (context.query.historyId) {
+    Object.assign(
+      props,
+      await propsFromHistory(
+        workspaceId,
+        context.query.historyId,
+      )
+    )
   }
-
-  const files = await getFiles(
-    exampleJson,
-    parseInt(context.query.changes),
-    parseInt(context.query.input),
-  ).catch(() => {})
-  if (!files) {
-    return notFound
-  }
-
-  const changes = await readFromDirectory(exampleDirectory, files.changes)
-  const input = await readFromDirectory(exampleDirectory, files.input)
 
   return {
-    props: {
-      exampleSet: exampleSet,
-      examples: examples,
-      changesId: context.query.changes,
-      changes: changes,
-      inputId: context.query.input,
-      input: input,
-    }
+    props: props
   }
 }
 
-function getExampleDirectory(exampleSet) {
-  let basePath = process.cwd()
-  if (process.env.NODE_ENV === "production") {
-    basePath = path.join(process.cwd(), ".next/server/chunks")
-  }
-  return path.join(basePath, "files", exampleSet)
+async function getWorkspaceId(workspaceName) {
+  let { data, error, status } = await supabase
+    .from("workspaces")
+    .select("id")
+    .eq("name", workspaceName)
+    .single()
+
+  return data.id
 }
 
-async function readExampleJson(exampleDirectory) {
-  const exampleContents = await readFromDirectory(
-    exampleDirectory,
-    "sc.json"
-  )
-  return JSON.parse(exampleContents)
-}
+async function propsFromWorkspaceId(workspaceId) {
+  let { data, error, status } = await supabase
+    .from("histories")
+    .select("*, changes (name)")
+    .eq("workspace_id", workspaceId)
 
-async function getFiles(exampleJson, changesId, inputId) {
-  const changes = exampleJson.changes.find((x) => x.id === changesId)
-  // noinspection JSUnresolvedVariable
-  const input = exampleJson.wordlists.find((x) => x.id === inputId)
   return {
-    changes: changes.file,
-    input: input.file,
+    examples: data.map(row => ({
+        name: row.name || row.changes.name,
+        changesId: row.changes_id,
+        inputId: row.input_id,
+      })
+    )
   }
 }
 
-async function readFromDirectory(directory, fname) {
-  return await fs.readFile(path.join(directory, fname), "utf8")
+async function propsFromChangesAndInput(workspaceId, changesId, inputId) {
+  return {
+    changesId: changesId,
+    changes: await getChanges(workspaceId, changesId),
+    inputId: inputId,
+    input: await getInput(workspaceId, inputId),
+  }
 }
 
-function exampleJsonToExamples(exampleJson) {
-  // noinspection JSUnresolvedVariable
-  return exampleJson.changes.map((change) => ({
-      name: change.name,
-      changesId: change.id,
-      inputId: change.inputs[0],
-    })
-  )
+async function getChanges(workspaceId, changesId) {
+  let {data, error, status} = await supabase
+    .from("changes")
+    .select("rules")
+    .eq("workspace_id", workspaceId)
+    .eq("local_number", changesId)
+    .single()
+
+  return data.rules
+}
+
+async function getInput(workspaceId, inputId) {
+  let {data, error, status} = await supabase
+    .from("wordlists")
+    .select("words")
+    .eq("workspace_id", workspaceId)
+    .eq("local_number", inputId)
+    .single()
+
+  return data.words
+}
+
+async function propsFromHistory(workspaceId, historyId) {
+  return Object()
 }
