@@ -157,7 +157,7 @@ export default class SC extends React.Component {
 
   runLexurgy() {
     this.setState((state) => {
-      const inputWords = this.inputWords(state)
+      const inputWords = this.activeInputWords(state)
       try {
         const soundChanger = lex.SoundChanger.Companion.fromLsc(state.changes)
         const { result, traceOutput } = this.runSoundChanger(state, soundChanger)
@@ -200,6 +200,11 @@ export default class SC extends React.Component {
     return state.input.split(/\r?\n/)
   }
 
+  activeInputWords(state) {
+    return state.trace.enabledAndChosen ?
+      [state.trace.chosen] : this.inputWords(state)
+  }
+
   ruleNames(state) {
     const lines = state.changes.split(/\r?\n/).map(
       (line) => line.trim()
@@ -225,9 +230,6 @@ export default class SC extends React.Component {
       let stages = runResult.stages
       let traceOutput = []
       if (runResult.traceOutput) {
-        const traceWordIndex = inputWords.indexOf(runResult.traceOutput.word)
-        inputWords = [inputWords[traceWordIndex]]
-        stages = stages.map((stage) => [stage[traceWordIndex]])
         traceOutput = [""].concat(runResult.traceOutput.lines)
       }
       let allStages = stages
@@ -259,7 +261,7 @@ export default class SC extends React.Component {
   runSoundChanger(state, soundChanger) {
     const traceOutput = []
     const result = soundChanger.change(
-      this.inputWords(state),
+      this.activeInputWords(state),
       state.startAt.enabledAndChosen ? state.startAt.chosen : null,
       state.stopBefore.enabledAndChosen ? state.stopBefore.chosen : null,
       state.trace.enabledAndChosen ? [state.trace.chosen] : [],
