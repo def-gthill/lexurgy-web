@@ -27,6 +27,7 @@ export default class SC extends React.Component {
         error: null,
         traceOutput: null,
       },
+      cachedResult: {},
       outputInputs: true,
       outputArrows: true,
       startAt: new CheckdropState(),
@@ -145,6 +146,9 @@ export default class SC extends React.Component {
   updateEditorWith(id, newValue) {
     this.setState({[id]: newValue})
     this.setState((state) => this.updateAllCheckdrops(state))
+    if (id === "changes") {
+      this.setState({cachedResult: {}})
+    }
   }
 
   setOutputInputs(event) {
@@ -161,15 +165,30 @@ export default class SC extends React.Component {
       try {
         const soundChanger = lex.SoundChanger.Companion.fromLsc(state.changes)
         const { result, traceOutput } = this.runSoundChanger(state, soundChanger)
-        const stages = result.map((result) => result.words)
-        return {
+        const stages = result.map((stage) => stage.words)
+        const newState = {
           runResult: {
             input: inputWords,
             stages: stages,
             error: null,
-            traceOutput: traceOutput
+            traceOutput: traceOutput,
           }
         }
+        if (this.isNormalRun(state)) {
+          const resultsToCache = Object.fromEntries(
+            inputWords.map(
+              (word, i) => [
+                word,
+                stages.map(stage => stage[i])
+              ]
+            )
+          )
+          newState.cachedResult = {
+            ...state.cachedResult,
+            ...resultsToCache,
+          }
+        }
+        return newState
       } catch (e) {
         return {
           runResult: {
@@ -183,10 +202,17 @@ export default class SC extends React.Component {
     })
   }
 
+  isNormalRun(state) {
+    return !(
+      state.startAt.enabledAndChosen ||
+      state.stopBefore.enabledAndChosen ||
+      state.trace.enabledAndChosen
+    )
+  }
+
   updateCheckdrop(id, enabled, chosen) {
     this.setState({[id]: new CheckdropState(enabled, chosen)})
   }
-
 
   updateAllCheckdrops(state) {
     return {
@@ -260,14 +286,39 @@ export default class SC extends React.Component {
 
   runSoundChanger(state, soundChanger) {
     const traceOutput = []
-    const result = soundChanger.change(
-      this.activeInputWords(state),
+    const allInputWords = this.activeInputWords(state)
+    let inputWords = allInputWords
+    if (this.isNormalRun(state)) {
+      inputWords = inputWords.filter(word => !(word in state.cachedResult))
+    }
+    let result = soundChanger.change(
+      inputWords,
       state.startAt.enabledAndChosen ? state.startAt.chosen : null,
       state.stopBefore.enabledAndChosen ? state.stopBefore.chosen : null,
       state.trace.enabledAndChosen ? [state.trace.chosen] : [],
       true,
       ((traceLine) => traceOutput.push(traceLine))
     )
+    if (this.isNormalRun(state)) {
+      const allResults = result.map(stage => ({
+        name: stage.name,
+        words: [],
+      }))
+      let i = 0
+      for (const word of allInputWords) {
+        if (word in state.cachedResult) {
+          allResults.forEach(
+            (stage, j) => stage.words.push(state.cachedResult[word][j])
+          )
+        } else {
+          allResults.forEach(
+            (stage, j) => stage.words.push(result[j].words[i])
+          )
+          i++
+        }
+      }
+      result = allResults
+    }
     return {
       result: result,
       traceOutput: state.trace.enabledAndChosen ? {
