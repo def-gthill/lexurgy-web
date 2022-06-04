@@ -77,15 +77,8 @@
     flex-direction: column;
   }
 
-  .inputContainer {
-    flex-basis: 0;
-  }
-
-  .changesContainer {
-    flex-basis: 0;
-  }
-
-  .outputContainer {
+  div.stackedEditor {
+    display: grid; /* Workaround for apparent iOS bug */
     flex-basis: 0;
   }
 
