@@ -78,8 +78,7 @@
   }
 
   div.stackedEditor {
-    display: grid; /* Workaround for apparent iOS bug */
-    flex-basis: 0;
+    flex-basis: auto;
   }
 
   div.stackedEditor textarea {
