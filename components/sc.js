@@ -21,6 +21,7 @@ export default class SC extends React.Component {
     this.state = {
       input: props.input,
       changes: props.changes,
+      changesCollapsed: false,
       runResult: {
         input: null,
         stages: null,
@@ -36,6 +37,8 @@ export default class SC extends React.Component {
     }
     this.avoidControlOverlap = this.avoidControlOverlap.bind(this)
     this.updateEditorWith = this.updateEditorWith.bind(this)
+    this.collapseChanges = this.collapseChanges.bind(this)
+    this.expandChanges = this.expandChanges.bind(this)
     this.setOutputInputs = this.setOutputInputs.bind(this)
     this.setOutputArrows = this.setOutputArrows.bind(this)
     this.runLexurgy = this.runLexurgy.bind(this)
@@ -59,6 +62,16 @@ export default class SC extends React.Component {
   }
 
   render() {
+    const changesContainerStyle =
+      this.state.changesCollapsed ? styles.changesContainerCollapsed :
+        styles.changesContainer
+
+    const collapseChangesText =
+      this.state.changesCollapsed ? "Expand >>" : "<< Collapse"
+
+    const collapseChangesCallback =
+      this.state.changesCollapsed ? this.expandChanges : this.collapseChanges
+
     return (
       <div className={styles.main}>
         <div className={styles.grid} ref={this.gridRef}>
@@ -77,9 +90,16 @@ export default class SC extends React.Component {
             value={this.state.changes}
             updateValue={this.updateEditorWith}
             expectedFileType=".lsc"
-            styles={`${styles.stackedEditor} ${styles.changesContainer}`}
+            styles={`${styles.stackedEditor} ${changesContainerStyle}`}
             showLineNumbers
-          />
+          >
+            <button
+              className={`button ${styles.collapseButton}`}
+              onClick={collapseChangesCallback}
+            >
+              {collapseChangesText}
+            </button>
+          </Editor>
           <Arrow/>
           <Editor
             id="output"
@@ -149,6 +169,14 @@ export default class SC extends React.Component {
     if (id === "changes") {
       this.setState({cachedResult: {}})
     }
+  }
+
+  collapseChanges() {
+    this.setState({changesCollapsed: true})
+  }
+
+  expandChanges() {
+    this.setState({changesCollapsed: false})
   }
 
   setOutputInputs(event) {

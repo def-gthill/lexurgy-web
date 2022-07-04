@@ -34,6 +34,10 @@
   flex: 1 1 500px;
 }
 
+.changesContainerCollapsed {
+  flex: 0 1 250px;
+}
+
 .outputContainer {
   flex: 1 0 250px;
 }
@@ -69,6 +73,12 @@
 
   .showStages input:first-of-type {
     margin-left: 0;
+  }
+}
+
+@media (max-width: 800px) {
+  .collapseButton {
+    display: none;
   }
 }
 
