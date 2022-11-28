@@ -4,6 +4,8 @@ import Editor from "../components/editor"
 import Arrow from "../components/arrow"
 import lexurgy from "../lib/lexurgy";
 import Checkdrop from "./checkdrop";
+import copy from "copy-to-clipboard";
+import {encode} from "js-base64";
 
 // noinspection JSUnresolvedVariable
 const lex = lexurgy.com.meamoria.lexurgy
@@ -39,6 +41,7 @@ export default class SC extends React.Component {
     this.updateEditorWith = this.updateEditorWith.bind(this)
     this.collapseChanges = this.collapseChanges.bind(this)
     this.expandChanges = this.expandChanges.bind(this)
+    this.share = this.share.bind(this)
     this.setOutputInputs = this.setOutputInputs.bind(this)
     this.setOutputArrows = this.setOutputArrows.bind(this)
     this.runLexurgy = this.runLexurgy.bind(this)
@@ -99,6 +102,7 @@ export default class SC extends React.Component {
             >
               {collapseChangesText}
             </button>
+            <button className="button" onClick={this.share}>Share</button>
           </Editor>
           <Arrow/>
           <Editor
@@ -177,6 +181,14 @@ export default class SC extends React.Component {
 
   expandChanges() {
     this.setState({changesCollapsed: false})
+  }
+
+  share() {
+    const inputEncoded = encode(this.state.input, true)
+    const changesEncoded = encode(this.state.changes, true)
+    const url = `www.lexurgy.com/sc?changes=${changesEncoded}&input=${inputEncoded}`
+    copy(url)
+    alert("Link copied to clipboard!")
   }
 
   setOutputInputs(event) {
