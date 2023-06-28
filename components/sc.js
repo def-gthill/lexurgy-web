@@ -6,6 +6,7 @@ import lexurgy from "../lib/lexurgy";
 import Checkdrop from "./checkdrop";
 import copy from "copy-to-clipboard";
 import {encode} from "js-base64";
+import axios from "axios";
 
 // noinspection JSUnresolvedVariable
 const lex = lexurgy.com.meamoria.lexurgy
@@ -199,38 +200,37 @@ export default class SC extends React.Component {
     this.setState({outputArrows: event.target.checked})
   }
 
-  runLexurgy() {
-    this.setState((state) => {
-      const inputWords = this.activeInputWords(state)
-      try {
-        const soundChanger = lex.SoundChanger.Companion.fromLsc(state.changes)
-        const { result, traceOutput } = this.runSoundChanger(state, soundChanger)
-        const stages = result.map((stage) => stage.words)
-        const newState = {
-          runResult: {
-            input: inputWords,
-            stages: stages,
-            error: null,
-            traceOutput: traceOutput,
-          }
+  async runLexurgy() {
+    const inputWords = this.activeInputWords(this.state)
+    try {
+      const { result, traceOutput } = await this.runSoundChanger(this.state)
+      const stages = result.map((stage) => stage.words)
+      const newState = {
+        runResult: {
+          input: inputWords,
+          stages: stages,
+          error: null,
+          traceOutput: traceOutput,
         }
-        if (this.isNormalRun(state)) {
-          const resultsToCache = Object.fromEntries(
-            inputWords.map(
-              (word, i) => [
-                word,
-                stages.map(stage => stage[i])
-              ]
-            )
+      }
+      if (this.isNormalRun(this.state)) {
+        const resultsToCache = Object.fromEntries(
+          inputWords.map(
+            (word, i) => [
+              word,
+              stages.map(stage => stage[i])
+            ]
           )
-          newState.cachedResult = {
-            ...state.cachedResult,
-            ...resultsToCache,
-          }
+        )
+        newState.cachedResult = {
+          ...this.state.cachedResult,
+          ...resultsToCache,
         }
-        return newState
-      } catch (e) {
-        return {
+      }
+      this.setState(newState)
+    } catch (e) {
+      this.setState(
+        {
           runResult: {
             input: inputWords,
             stages: null,
@@ -238,8 +238,8 @@ export default class SC extends React.Component {
             traceOutput: null,
           }
         }
-      }
-    })
+      )
+    }
   }
 
   isNormalRun(state) {
@@ -324,21 +324,31 @@ export default class SC extends React.Component {
     return [Array(stages[0].length).fill("")].concat(stages)
   }
 
-  runSoundChanger(state, soundChanger) {
-    const traceOutput = []
+  async runSoundChanger(state) {
     const allInputWords = this.activeInputWords(state)
     let inputWords = allInputWords
     if (this.isNormalRun(state)) {
       inputWords = inputWords.filter(word => !(word in state.cachedResult))
     }
-    let result = soundChanger.change(
+    const request = {
+      changes: state.changes,
       inputWords,
-      state.startAt.enabledAndChosen ? state.startAt.chosen : null,
-      state.stopBefore.enabledAndChosen ? state.stopBefore.chosen : null,
-      state.trace.enabledAndChosen ? [state.trace.chosen] : [],
-      true,
-      ((traceLine) => traceOutput.push(traceLine))
+      traceWords: state.trace.enabledAndChosen ? [state.trace.chosen] : [],
+      startAt: state.startAt.enabledAndChosen ? state.startAt.chosen : null,
+      stopBefore: state.stopBefore.enabledAndChosen ? state.stopBefore.chosen : null
+    }
+    const response = await axios.post(
+      "/api/services",
+      request,
+      {
+        params: { endpoint: "scv1" }
+      }
     )
+    let result = [
+      ...Object.entries(response.data.intermediateWords || {}).map(([name, words]) => ({ name, words })),
+      { name: null, words: response.data.outputWords }
+    ]
+    const traceOutput = response.data.traces
     if (this.isNormalRun(state)) {
       const allResults = result.map(stage => ({
         name: stage.name,
