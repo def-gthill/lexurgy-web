@@ -2,14 +2,10 @@ import React from "react";
 import styles from "../styles/SC.module.css"
 import Editor from "../components/editor"
 import Arrow from "../components/arrow"
-import lexurgy from "../lib/lexurgy";
 import Checkdrop from "./checkdrop";
 import copy from "copy-to-clipboard";
 import {encode} from "js-base64";
 import axios from "axios";
-
-// noinspection JSUnresolvedVariable
-const lex = lexurgy.com.meamoria.lexurgy
 
 export default class SC extends React.Component {
   static defaultProps = {
@@ -308,7 +304,8 @@ export default class SC extends React.Component {
       if (state.outputArrows && !state.outputInputs && allStages.length > 1) {
         allStages = this.addLeadingArrows(allStages)
       }
-      return lex.scMakeStageComparisons(allStages).concat(traceOutput).join("\n")
+      // TODO Copy over pure JS stage comparisons
+      return allStages.concat(traceOutput).join("\n")
     }
   }
 

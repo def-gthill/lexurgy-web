@@ -1,5 +1,3 @@
-const CopyPlugin = require("copy-webpack-plugin")
-
 // noinspection JSUnusedGlobalSymbols
 module.exports = {
   reactStrictMode: true,
