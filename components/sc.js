@@ -341,6 +341,9 @@ export default class SC extends React.Component {
   }
 
   joinRowWithArrows(row, padLengths) {
+    if (!row[0]) {
+      return ""
+    }
     const arrow = " => ";
     const stringsToJoin = [];
     row.forEach((word, i) => {
