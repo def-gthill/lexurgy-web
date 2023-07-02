@@ -289,12 +289,7 @@ export default class SC extends React.Component {
       return ""
     } else {
       let inputWords = runResult.input
-      let stages = runResult.stages
-      let traceOutput = []
-      if (runResult.traceOutput) {
-        traceOutput = [""].concat(runResult.traceOutput.lines)
-      }
-      let allStages = stages
+      let allStages = runResult.stages
       if (!state.outputArrows) {
         allStages = this.removeIntermediates(allStages)
       }
@@ -304,8 +299,11 @@ export default class SC extends React.Component {
       if (state.outputArrows && !state.outputInputs && allStages.length > 1) {
         allStages = this.addLeadingArrows(allStages)
       }
-      // TODO Copy over pure JS stage comparisons
-      return this.stagesToString(allStages) + traceOutput.join("\n")
+      let output = this.stagesToString(allStages);
+      if (runResult.traceOutput) {
+        output += "\n" + runResult.traceOutput;
+      }
+      return output;
     }
   }
 
@@ -387,7 +385,6 @@ export default class SC extends React.Component {
       ...Object.entries(response.data.intermediateWords || {}).map(([name, words]) => ({ name, words })),
       { name: null, words: response.data.outputWords }
     ]
-    const traceOutput = response.data.traces
     if (this.isNormalRun(state)) {
       const allResults = result.map(stage => ({
         name: stage.name,
@@ -410,11 +407,21 @@ export default class SC extends React.Component {
     }
     return {
       result: result,
-      traceOutput: state.trace.enabledAndChosen ? {
-        word: state.trace.chosen,
-        lines: (traceOutput || "Word didn't change"),
-      } : null
+      traceOutput: state.trace.enabledAndChosen ? (
+        this.traceOutputAsString(response.data.traces) || "Word didn't change"
+      ) : null
     }
+  }
+
+  traceOutputAsString(traces) {
+    const [word, steps] = [...Object.entries(traces)][0]
+    let previousWord = word;
+    const lines = []
+    for (const step of steps) {
+      lines.push(`Applied ${step.rule}: ${previousWord} -> ${step.output}`)
+      previousWord = step.output;
+    }
+    return lines.join("\n")
   }
 }
 
