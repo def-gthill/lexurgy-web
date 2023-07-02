@@ -305,7 +305,7 @@ export default class SC extends React.Component {
         allStages = this.addLeadingArrows(allStages)
       }
       // TODO Copy over pure JS stage comparisons
-      return allStages.concat(traceOutput).join("\n")
+      return this.stagesToString(allStages) + traceOutput.join("\n")
     }
   }
 
@@ -319,6 +319,48 @@ export default class SC extends React.Component {
 
   addLeadingArrows(stages) {
     return [Array(stages[0].length).fill("")].concat(stages)
+  }
+
+  stagesToString(stages) {
+    const rows = this.stagesToRows(stages);
+    const lines = this.joinAllRowsWithArrows(rows);
+    return lines.join("\n") + "\n";
+  }
+
+  stagesToRows(stages) {
+    return stages[0].map((_, i) => stages.map((stage) => stage[i]))
+  }
+
+  joinAllRowsWithArrows(rows) {
+    if (rows.length === 0) {
+      return [];
+    }
+    const padLengths = [];
+    for (let i = 0; i < rows[0].length - 1; i++) {
+      padLengths.push(Math.max(...rows.map((row) => row[i].length)));
+    }
+    return rows.map((row) => this.joinRowWithArrows(row, padLengths));
+  }
+
+  joinRowWithArrows(row, padLengths) {
+    const arrow = " => ";
+    const stringsToJoin = [];
+    row.forEach((word, i) => {
+      if (padLengths[i]) {
+        stringsToJoin.push(
+          this.padEndCompensatingForDiacritics(word, padLengths[i])
+        );
+      } else {
+        stringsToJoin.push(word ?? "");
+      }
+    });
+    return stringsToJoin.join(arrow);
+  }
+
+  padEndCompensatingForDiacritics(s, padLength) {
+    const numberOfDiacritics = (s.match(/\p{Mn}/gu) ?? []).length;
+    const padLengthCompensatingForDiacritics = padLength + numberOfDiacritics;
+    return s.padEnd(padLengthCompensatingForDiacritics);
   }
 
   async runSoundChanger(state) {

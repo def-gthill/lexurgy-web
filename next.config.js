@@ -1,7 +1,6 @@
 // noinspection JSUnusedGlobalSymbols
 module.exports = {
   reactStrictMode: true,
-  target: "serverless",
   redirects: async function() {
     return [
       {
