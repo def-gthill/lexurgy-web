@@ -27,7 +27,7 @@ export default class Editor extends React.Component {
       readOnly={!this.props.editable}
       cols={1}
       spellCheck={false}
-      style={this.props.wrap ? {whiteSpace: "normal"} : {}}
+      style={this.props.wrap ? {whiteSpace: "pre-wrap"} : {}}
     />;
 
     if (this.props.showLineNumbers) {

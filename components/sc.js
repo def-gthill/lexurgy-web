@@ -5,7 +5,7 @@ import Arrow from "../components/arrow"
 import Checkdrop from "./checkdrop";
 import copy from "copy-to-clipboard";
 import {encode} from "js-base64";
-import axios from "axios";
+import axios, {isAxiosError} from "axios";
 
 export default class SC extends React.Component {
   static defaultProps = {
@@ -199,7 +199,21 @@ export default class SC extends React.Component {
   async runLexurgy() {
     const inputWords = this.activeInputWords(this.state)
     try {
-      const { result, traceOutput } = await this.runSoundChanger(this.state)
+      const { result, traceOutput, ruleFailures } = await this.runSoundChanger(this.state)
+      if (ruleFailures) {
+        const firstFailure = ruleFailures[0];
+        this.setState(
+          {
+            runResult: {
+              input: inputWords,
+              stages: null,
+              error: this.makeErrorMessageForRuleFailure(firstFailure),
+              traceOutput: null,
+            }
+          }
+        )
+        return;
+      }
       const stages = result.map((stage) => stage.words)
       const newState = {
         runResult: {
@@ -225,16 +239,20 @@ export default class SC extends React.Component {
       }
       this.setState(newState)
     } catch (e) {
-      this.setState(
-        {
-          runResult: {
-            input: inputWords,
-            stages: null,
-            error: e.message,
-            traceOutput: null,
+      if (isAxiosError(e)) {
+        this.setState(
+          {
+            runResult: {
+              input: inputWords,
+              stages: null,
+              error: this.makeErrorMessage(e.response.data),
+              traceOutput: null,
+            }
           }
-        }
-      )
+        )
+      } else {
+        throw e;
+      }
     }
   }
 
@@ -244,6 +262,27 @@ export default class SC extends React.Component {
       state.stopBefore.enabledAndChosen ||
       state.trace.enabledAndChosen
     )
+  }
+
+  makeErrorMessage(err) {
+    switch (err.type) {
+      case "parseError":
+        return `${err.message} (line ${err.lineNumber})`
+      case "invalidExpression":
+        return `Error in expression ${err.expressionNumber} ("${err.expression}") `
+          + `of rule "${err.rule}"\n\n${err.message}`
+      default:
+        return err.message
+    }
+  }
+
+  makeErrorMessageForRuleFailure(failure) {
+    if (failure.rule) {
+      return `Rule "${failure.rule}" could not be applied to word `
+        + `"${failure.currentWord}" (originally "${failure.originalWord}")\n\n${failure.message}`
+    } else {
+      return failure.message;
+    }
   }
 
   updateCheckdrop(id, enabled, chosen) {
@@ -412,7 +451,8 @@ export default class SC extends React.Component {
       result: result,
       traceOutput: state.trace.enabledAndChosen ? (
         this.traceOutputAsString(response.data.traces) || "Word didn't change"
-      ) : null
+      ) : null,
+      ruleFailures: response.data.errors
     }
   }
 
