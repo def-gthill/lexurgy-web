@@ -4,6 +4,7 @@ import SC from "../../components/sc";
 import Frame from "../../components/frame"
 import styles from "../../styles/ExampleSC.module.css"
 import {supabase} from "../../utils/supabaseClient";
+import axios from "axios";
 
 export default class ExampleSC extends React.Component {
 
@@ -24,7 +25,7 @@ export default class ExampleSC extends React.Component {
     const selectedInputId = examples[this.state.selectedChanges].inputId
     const exampleLink = `/${this.props.exampleSet}/sc?changes=${selectedChangesId}&input=${selectedInputId}`
     return (
-      <Frame>
+      <Frame version={this.props.version}>
         <div className={styles.exampleNav}>
           <label htmlFor="lscs">Example Sound Changes</label>
           <div className={styles.exampleMenu}>
@@ -108,8 +109,15 @@ class QueryResult {
 export async function getServerSideProps(context) {
   // noinspection JSUnresolvedVariable
   const workspaceName = context.params.exampleSet
+
+  const response = await axios.get(
+    `${process.env.LEXURGY_SERVICES_URL}/version`
+  )
+  const version = response.data;
+
   const initialProps = {
-    exampleSet: workspaceName
+    exampleSet: workspaceName,
+    version,
   }
 
   const props = getWorkspaceId(workspaceName).flatMap(workspaceId =>

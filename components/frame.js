@@ -3,10 +3,8 @@ import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
 
-const version = "1.2.2"
-const releaseUrl = "https://github.com/def-gthill/lexurgy/releases/tag/v" + version
-
-export default function Frame(props) {
+export default function Frame({ children, version }) {
+  const releaseUrl = "https://github.com/def-gthill/lexurgy/releases/tag/v" + version
   return (
     <div className={styles.container}>
       <Head>
@@ -66,7 +64,7 @@ export default function Frame(props) {
         </div>
       </header>
 
-      <main className={styles.main}>{props.children}</main>
+      <main className={styles.main}>{children}</main>
 
       <footer className={styles.footer}>
         Powered by <a href={releaseUrl}>Lexurgy {version}</a>
