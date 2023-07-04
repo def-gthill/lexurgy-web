@@ -54,6 +54,10 @@ select {
   opacity: 0.9;
 }
 
+.button:disabled {
+  opacity: 0.9;
+}
+
 .big-button {
   font-size: 2em;
 }

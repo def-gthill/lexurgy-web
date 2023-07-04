@@ -21,6 +21,7 @@ export default class SC extends React.Component {
       input: props.input,
       changes: props.changes,
       changesCollapsed: false,
+      running: false,
       runResult: {
         input: null,
         stages: null,
@@ -158,7 +159,11 @@ export default class SC extends React.Component {
               onChange={this.updateCheckdrop}
             />
           </div>
-          <button className="button big-button" onClick={this.runLexurgy}>Apply</button>
+          <button
+            className="button big-button"
+            onClick={this.runLexurgy}
+            disabled={this.state.running}
+          >Apply</button>
         </div>
       </div>
     )
@@ -199,7 +204,9 @@ export default class SC extends React.Component {
   async runLexurgy() {
     const inputWords = this.activeInputWords(this.state)
     try {
+      this.setState({ running: true })
       const { result, traceOutput, ruleFailures } = await this.runSoundChanger(this.state)
+      this.setState({ running: false })
       if (ruleFailures) {
         const firstFailure = ruleFailures[0];
         this.setState(
@@ -322,28 +329,32 @@ export default class SC extends React.Component {
 
   output(state) {
     const runResult = state.runResult
+    if (state.running) {
+      return "Running..."
+    }
     if (runResult.error) {
       return runResult.error
-    } else if (!runResult.stages) {
-      return ""
-    } else {
-      let inputWords = runResult.input
-      let allStages = runResult.stages
-      if (!state.outputArrows) {
-        allStages = this.removeIntermediates(allStages)
-      }
-      if (state.outputInputs) {
-        allStages = this.addInputs(allStages, inputWords)
-      }
-      if (state.outputArrows && !state.outputInputs && allStages.length > 1) {
-        allStages = this.addLeadingArrows(allStages)
-      }
-      let output = this.stagesToString(allStages);
-      if (runResult.traceOutput) {
-        output += "\n" + runResult.traceOutput;
-      }
-      return output;
     }
+    if (!runResult.stages) {
+      return ""
+    }
+
+    let inputWords = runResult.input
+    let allStages = runResult.stages
+    if (!state.outputArrows) {
+      allStages = this.removeIntermediates(allStages)
+    }
+    if (state.outputInputs) {
+      allStages = this.addInputs(allStages, inputWords)
+    }
+    if (state.outputArrows && !state.outputInputs && allStages.length > 1) {
+      allStages = this.addLeadingArrows(allStages)
+    }
+    let output = this.stagesToString(allStages);
+    if (runResult.traceOutput) {
+      output += "\n" + runResult.traceOutput;
+    }
+    return output;
   }
 
   removeIntermediates(stages) {
