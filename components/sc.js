@@ -206,7 +206,6 @@ export default class SC extends React.Component {
     try {
       this.setState({ running: true })
       const { result, traceOutput, ruleFailures } = await this.runSoundChanger(this.state)
-      this.setState({ running: false })
       if (ruleFailures) {
         const firstFailure = ruleFailures[0];
         this.setState(
@@ -246,6 +245,8 @@ export default class SC extends React.Component {
       }
       this.setState(newState)
     } catch (e) {
+      console.log(e);
+      console.log(isAxiosError(e));
       if (isAxiosError(e)) {
         this.setState(
           {
@@ -260,6 +261,8 @@ export default class SC extends React.Component {
       } else {
         throw e;
       }
+    } finally {
+      this.setState({ running: false })
     }
   }
 
