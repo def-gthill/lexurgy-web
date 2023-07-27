@@ -394,7 +394,7 @@ export default class SC extends React.Component {
   }
 
   joinRowWithArrows(row, padLengths) {
-    if (!row[0]) {
+    if (!row.at(-1)) {
       return ""
     }
     const arrow = " => ";
