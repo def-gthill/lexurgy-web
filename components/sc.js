@@ -245,8 +245,6 @@ export default class SC extends React.Component {
       }
       this.setState(newState)
     } catch (e) {
-      console.log(e);
-      console.log(isAxiosError(e));
       if (isAxiosError(e)) {
         this.setState(
           {
