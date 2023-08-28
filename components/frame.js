@@ -3,6 +3,8 @@ import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
 
+const oldUrl = "https://lexurgy-j4yvfxcce-def-gthill.vercel.app/sc"
+
 export default function Frame({ children, version }) {
   const releaseUrl = "https://github.com/def-gthill/lexurgy/releases/tag/v" + version
   return (
@@ -67,7 +69,13 @@ export default function Frame({ children, version }) {
       <main className={styles.main}>{children}</main>
 
       <footer className={styles.footer}>
-        Powered by <a href={releaseUrl}>Lexurgy {version}</a>
+        <div>
+          Powered by <a href={releaseUrl} target={"_blank"} rel="noreferrer">Lexurgy {version}</a>
+        </div>
+        <div>
+          New version broke something? Go back to <a href={oldUrl} target={"_blank"} rel="noreferrer">Old Lexurgy</a>
+        </div>
+        {/* Powered by <a href={releaseUrl}>Lexurgy {version}</a> */}
       </footer>
     </div>
   )
