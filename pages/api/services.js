@@ -1,5 +1,7 @@
 import axios, {HttpStatusCode} from "axios";
 
+export const runtime = "edge";
+
 export default async function handler(
   req,
   res
