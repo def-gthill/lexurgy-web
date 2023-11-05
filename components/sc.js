@@ -5,7 +5,7 @@ import Arrow from "../components/arrow"
 import Checkdrop from "./checkdrop";
 import copy from "copy-to-clipboard";
 import {encode} from "js-base64";
-import axios, {isAxiosError} from "axios";
+import axios, {HttpStatusCode, isAxiosError} from "axios";
 
 export default class SC extends React.Component {
   static defaultProps = {
@@ -22,6 +22,7 @@ export default class SC extends React.Component {
       changes: props.changes,
       changesCollapsed: false,
       running: false,
+      runStatus: "Running...",
       runResult: {
         input: null,
         stages: null,
@@ -204,8 +205,17 @@ export default class SC extends React.Component {
   async runLexurgy() {
     const inputWords = this.activeInputWords(this.state)
     try {
-      this.setState({ running: true })
-      const { result, traceOutput, ruleFailures } = await this.runSoundChanger(this.state)
+      this.setState({
+        running: true,
+        runStatus: "Running...", 
+        runResult: {
+          input: null,
+          stages: null,
+          error: null,
+          traceOutput: null,
+        },
+      });
+      const { result, traceOutput, ruleFailures } = await this.runSoundChanger(this.state);
       if (ruleFailures) {
         const firstFailure = ruleFailures[0];
         this.setState(
@@ -273,6 +283,9 @@ export default class SC extends React.Component {
   }
 
   makeErrorMessage(err) {
+    if (err.result) {
+      return this.makeErrorMessage(err.result);
+    }
     switch (err.type) {
       case "parseError":
         return `${err.message} (line ${err.lineNumber})`
@@ -331,7 +344,7 @@ export default class SC extends React.Component {
   output(state) {
     const runResult = state.runResult
     if (state.running) {
-      return "Running..."
+      return state.runStatus;
     }
     if (runResult.error) {
       return runResult.error
@@ -426,15 +439,20 @@ export default class SC extends React.Component {
       inputWords,
       traceWords: state.trace.enabledAndChosen ? [state.trace.chosen] : [],
       startAt: state.startAt.enabledAndChosen ? state.startAt.chosen : null,
-      stopBefore: state.stopBefore.enabledAndChosen ? state.stopBefore.chosen : null
+      stopBefore: state.stopBefore.enabledAndChosen ? state.stopBefore.chosen : null,
+      allowPolling: true,
     }
-    const response = await axios.post(
+    const startTime = new Date();
+    let response = await axios.post(
       "/api/services",
       request,
       {
         params: { endpoint: "scv1" }
       }
     )
+    if (response.status === HttpStatusCode.Accepted) {
+      response = await this.pollSoundChanger(response.data.url, startTime);
+    }
     let result = [
       ...Object.entries(response.data.intermediateWords || {}).map(([name, words]) => ({ name, words })),
       { name: null, words: response.data.outputWords }
@@ -466,6 +484,30 @@ export default class SC extends React.Component {
       ) : null,
       ruleFailures: response.data.errors
     }
+  }
+
+  pollSoundChanger(url, startTime) {
+    return new Promise((resolve, reject) => {
+      let status = "Running..."
+      const timer = setInterval(
+        async () => {
+          try {
+            const response = await axios.get("/api/services", {params: {endpoint: url}});
+            const elapsedSeconds = Math.round((new Date().getTime() - startTime.getTime()) / 1000);
+            status += `\nStill running... (${elapsedSeconds} seconds passed)`
+            this.setState({runStatus: status})
+            if (response.data.status === "done") {
+              clearInterval(timer);
+              resolve({data: response.data.result});
+            }
+          } catch (e) {
+            clearInterval(timer);
+            reject(e);
+          }
+        },
+        2500,
+      )
+    })
   }
 
   traceOutputAsString(traces) {
