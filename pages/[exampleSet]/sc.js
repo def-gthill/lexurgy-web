@@ -3,8 +3,8 @@ import Link from "next/link";
 import SC from "../../components/sc";
 import Frame from "../../components/frame"
 import styles from "../../styles/ExampleSC.module.css"
-import {supabase} from "../../utils/supabaseClient";
 import axios from "axios";
+import neo4j from "neo4j-driver";
 
 export default class ExampleSC extends React.Component {
 
@@ -56,54 +56,82 @@ export default class ExampleSC extends React.Component {
   }
 }
 
-const notFound = {
-  notFound: true
+function getDriver() {
+  return neo4j.driver(
+    process.env.NEO4J_URL || "",
+    neo4j.auth.basic(
+      process.env.NEO4J_USERNAME || "",
+      process.env.NEO4J_PASSWORD || ""
+    ),
+    { disableLosslessIntegers: true }
+  );
 }
 
-class QueryResult {
-  constructor(query) {
-    this.query = query
-  }
-
-  map(f) {
-    return new QueryResult(async () => {
-      const result = await this.query()
-      if (result.error) {
-        return result
-      } else {
-        return {
-          data: f(result.data),
-          error: result.error
-        }
-      }
-    })
-  }
-
-  flatMap(f) {
-    return new QueryResult(async () => {
-      const result = await this.query()
-      if (result.error) {
-        return result
-      } else {
-        return await f(result.data).query()
-      }
-    })
-  }
-
-  static always(data) {
-    return new QueryResult(() =>
-      ({data: data, error: null})
-    )
-  }
-
-  async unpack() {
-    const result = await this.query()
-    if (result.error) {
-      return notFound
-    } else {
-      return result.data
+const workspaces = {
+  examples: [
+    {
+      name: "Basican",
+      languageId: "b364843c-7436-471e-98d1-69f58f87253c",
+      inputId: 1,
+      changesId: 1,
+    },
+    {
+      name: "Intermediatese",
+      languageId: "3603f34a-3d31-43cf-927e-b2242a5ff940",
+      inputId: 1,
+      changesId: 2,
+    },
+    {
+      name: "Advancedish",
+      languageId: "f7833c73-dbca-4bb0-816a-2fa177ee1a14",
+      inputId: 1,
+      changesId: 3,
+    },
+    {
+      name: "Syllabian",
+      languageId: "d21af848-1327-4a64-8e97-888b82c871e0",
+      inputId: 2,
+      changesId: 4,
+    },
+    {
+      name: "Adding Machine",
+      languageId: "9583f437-aa8b-480d-8c53-85798944f4d2",
+      inputId: 3,
+      changesId: 5,
     }
-  }
+  ],
+  langtime: [
+    {
+      name: "Engála (Rabbits)",
+      languageId: "6c9cd3d5-43c6-4edf-b802-4a7d3f2ce95d",
+      inputId: 1,
+      changesId: 1,
+    },
+    {
+      name: "Tpaalha (Opposums)",
+      languageId: "711bc727-69da-41dc-9aa4-dcb0d02f91f7",
+      inputId: 2,
+      changesId: 2,
+    },
+    {
+      name: "Wokuthízhű (Mice)",
+      languageId: "dbf60de9-2980-47ad-a1c7-6bfc057be7cd",
+      inputId: 3,
+      changesId: 3,
+    },
+    {
+      name: "Sarkezhe (Cats)",
+      languageId: "25beb458-5745-43f0-9f40-1f2bb9d47b3f",
+      inputId: 4,
+      changesId: 4,
+    },
+    {
+      name: "Haughòf (Dogs)",
+      languageId: "c399f32a-f3df-449d-8a98-7baf8ea8016b",
+      inputId: 5,
+      changesId: 5,
+    }
+  ],
 }
 
 export async function getServerSideProps(context) {
@@ -115,102 +143,38 @@ export async function getServerSideProps(context) {
   )
   const version = response.data;
 
+  const workspace = workspaces[workspaceName];
+
   const initialProps = {
     exampleSet: workspaceName,
+    examples: workspace,
     version,
   }
 
-  const props = getWorkspaceId(workspaceName).flatMap(workspaceId =>
-    propsFromWorkspaceId(workspaceId).map(workspaceProps =>
-      ({...initialProps, ...workspaceProps})
-    ).flatMap(props => {
-      if (context.query.changes && context.query.input) {
-        return propsFromChangesAndInput(
-          workspaceId,
-          context.query.changes,
-          context.query.input,
-        ).map(historyProps =>
-          ({...props, ...historyProps})
-        )
-      } else if (context.query.historyId) {
-        return propsFromHistory(
-          workspaceId,
-          context.query.historyId,
-        ).map(historyProps =>
-          ({...props, ...historyProps})
-        )
-      } else {
-        return QueryResult.always(props)
-      }
-    })
-  )
+  if (!context.query.changes) {
+    return {props: initialProps};
+  }
 
-  return props.map(props =>
-    ({props: props})
-  ).unpack()
-}
-
-function getWorkspaceId(workspaceName) {
-  return new QueryResult(async () =>
-    await supabase
-      .from("workspaces")
-      .select("id")
-      .eq("name", workspaceName)
-      .single()
-  ).map(data => data.id)
-}
-
-function propsFromWorkspaceId(workspaceId) {
-  return new QueryResult(async () =>
-    await supabase
-      .from("histories")
-      .select("*, changes (local_number, name), input_id (local_number)")
-      .eq("workspace_id", workspaceId)
-  ).map(data => ({
-      examples: data.map(row => ({
-          name: row.name || row.changes.name,
-          changesId: row.changes.local_number,
-          inputId: row.input_id.local_number,
-        })
-      )
-    })
-  )
-}
-
-function propsFromChangesAndInput(workspaceId, changesId, inputId) {
-  return getChanges(workspaceId, changesId).flatMap(changes =>
-    getInput(workspaceId, inputId).map(input => ({
-        changesId: changesId,
-        changes: changes,
-        inputId: inputId,
-        input: input,
-      })
+  const language = workspace.find(
+    (lang) => (
+      lang.inputId == context.query.input &&
+      lang.changesId == context.query.changes
     )
-  )
-}
+  );
 
-function getChanges(workspaceId, changesId) {
-  return new QueryResult(async () =>
-    await supabase
-      .from("changes")
-      .select("rules")
-      .eq("workspace_id", workspaceId)
-      .eq("local_number", changesId)
-      .single()
-  ).map(data => data.rules)
-}
+  const driver = getDriver();
+  const session = driver.session();
+  const query = "MATCH (ev:Evolution) -[:IS_IN]-> (lang:Language {id: $id}) RETURN ev;";
+  const result = await session.run(query, {id: language.languageId});
+  const record = result.records[0].get("ev").properties;
+  const testWords = record["testWords"];
+  const soundChanges = record["soundChanges"];
 
-function getInput(workspaceId, inputId) {
-  return new QueryResult(async () =>
-    await supabase
-      .from("wordlists")
-      .select("words")
-      .eq("workspace_id", workspaceId)
-      .eq("local_number", inputId)
-      .single()
-  ).map(data => data.words)
-}
-
-async function propsFromHistory(workspaceId, historyId) {
-  return Object()
+  return {props: {
+    ...initialProps,
+    input: testWords.join("\n"),
+    changes: soundChanges,
+    inputId: context.query.input,
+    changesId: context.query.changes,
+  }};
 }
