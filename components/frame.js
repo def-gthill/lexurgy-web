@@ -56,12 +56,6 @@ export default function Frame({ children, version }) {
                 target="_blank" rel="noreferrer"
               >Donate</a>
             </li>
-            <li>
-              <a
-                href="https://www.meamoria.com/contact-me/"
-                target="_blank" rel="noreferrer"
-              >Contact</a>
-            </li>
           </ul>
         </div>
       </header>
