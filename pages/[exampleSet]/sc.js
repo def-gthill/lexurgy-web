@@ -130,6 +130,12 @@ const workspaces = {
       languageId: "c399f32a-f3df-449d-8a98-7baf8ea8016b",
       inputId: 5,
       changesId: 5,
+    },
+    {
+      name: "Beaverlang",
+      languageId: "5354bfb9-ae6d-4ca2-8fee-4219832495e3",
+      inputId: 6,
+      changesId: 6,
     }
   ],
 }
