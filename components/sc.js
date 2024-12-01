@@ -451,7 +451,11 @@ export default class SC extends React.Component {
       }
     )
     if (response.status === HttpStatusCode.Accepted) {
-      response = await this.pollSoundChanger(response.data.url, startTime);
+      response = await this.pollSoundChanger(
+        response.data.url,
+        response.data.affinityHeaders,
+        startTime
+      );
     }
     let result = [
       ...Object.entries(response.data.intermediateWords || {}).map(([name, words]) => ({ name, words })),
@@ -486,13 +490,16 @@ export default class SC extends React.Component {
     }
   }
 
-  pollSoundChanger(url, startTime) {
+  pollSoundChanger(url, affinityHeaders, startTime) {
     return new Promise((resolve, reject) => {
       let status = "Running..."
       const timer = setInterval(
         async () => {
           try {
-            const response = await axios.get("/api/services", {params: {endpoint: url}});
+            const response = await axios.get(
+              "/api/services",
+              {params: {endpoint: url}, headers: affinityHeaders}
+            );
             const elapsedSeconds = Math.round((new Date().getTime() - startTime.getTime()) / 1000);
             status += `\nStill running... (${elapsedSeconds} seconds passed)`
             this.setState({runStatus: status})
