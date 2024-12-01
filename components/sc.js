@@ -498,7 +498,12 @@ export default class SC extends React.Component {
           try {
             const response = await axios.get(
               "/api/services",
-              {params: {endpoint: url}, headers: affinityHeaders}
+              {
+                params: {endpoint: url},
+                headers: {
+                  "lexurgy-affinity-headers": JSON.stringify(affinityHeaders)
+                }
+              }
             );
             const elapsedSeconds = Math.round((new Date().getTime() - startTime.getTime()) / 1000);
             status += `\nStill running... (${elapsedSeconds} seconds passed)`
