@@ -37,7 +37,7 @@ export default function Frame({ children, version }) {
           <ul className={styles.menuList}>
             <li>
               <a
-                href="https://www.meamoria.com/lexurgy/html/sc-tutorial.html"
+                href="https://lexurgy-app.vercel.app/sc/docs"
                 target="_blank" rel="noreferrer"
               >Docs</a>
             </li>
