@@ -3,7 +3,7 @@ import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
 
-const newUrl = "https://lexurgy-app.vercel.app/sc"
+const newUrl = "https://www.lexurgy.com/sc"
 
 export default function Frame({ children, version }) {
   const releaseUrl = "https://github.com/def-gthill/lexurgy/releases/tag/v" + version
